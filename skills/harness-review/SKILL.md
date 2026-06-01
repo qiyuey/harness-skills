@@ -10,6 +10,19 @@ metadata:
 
 针对**多步骤 skill**（含 Task 1-N / Step 0-N / 阶段 1-N 等结构）的 **harness 设计审计**。
 
+## 铁律（The Iron Law）
+
+```
+只评工程稳定性，不评领域质量；每个结论必须引用原文行号。
+ENGINEERING ONLY — EVERY FINDING CITES A LINE.
+```
+
+- 评估范围严格限于 harness 工程（A-G 七维）；数字对不对、文笔好不好一律转交 domain review。
+- 任何 PASS/FAIL 结论都必须引用 SKILL.md 具体行号或原文摘录，不接受空泛断言。
+- 审计报告只输出到对话；仅当用户明确说"按建议修复"时才改文件。
+
+> **违背流程的字面，就是违背审计的精神。**
+
 > **Harness 工程**：把不稳定的 LLM 包装成稳定可恢复的工作流。本 skill 不评估领域质量（数字对不对、文笔好不好），只评估 **当 LLM 中断、token 用尽、部分失败、产出有问题时，这个 skill 能不能恢复、定位、修复**。
 
 ## 适用性前置判断
