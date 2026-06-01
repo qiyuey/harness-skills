@@ -1,6 +1,17 @@
 # harness-skills
 
+[![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-d97757)](https://github.com/qiyuey/harness-skills)
+[![Codex](https://img.shields.io/badge/Codex-plugin-412991)](https://github.com/qiyuey/harness-skills)
+[![evals](https://img.shields.io/badge/evals-L1_PASS_·_L2_6%2F6_·_L3_18%2F18-2ea44f)](evals/README.md)
+[![license](https://img.shields.io/github/license/qiyuey/harness-skills)](LICENSE)
+
 Generic **LLM workflow harness methodology** for AI agents (Claude Code / Codex).
+
+```bash
+# Claude Code — install all three skills as a plugin
+/plugin marketplace add qiyuey/harness-skills
+/plugin install harness-skills@harness-skills
+```
 
 "Harness engineering" = wrapping an unreliable LLM into a **stable, recoverable** multi-step workflow. These skills don't judge domain quality (是否数字对、文笔好). They judge whether a workflow **survives interruption, token exhaustion, partial failure, and post-mortem investigation**.
 
@@ -33,7 +44,21 @@ Pick directly:
 
 ### Full plugin (all three skills)
 
-Add this repo as a plugin (Claude Code reads `.claude-plugin/plugin.json`; Codex reads `.codex-plugin/plugin.json`). Skills are auto-discovered from `skills/`.
+This repo doubles as its own plugin marketplace. Skills are auto-discovered from `skills/`.
+
+**Claude Code** (reads `.claude-plugin/plugin.json`):
+
+```bash
+/plugin marketplace add qiyuey/harness-skills
+/plugin install harness-skills@harness-skills
+```
+
+**Codex CLI** (reads `.codex-plugin/plugin.json`):
+
+```bash
+codex plugin marketplace add https://github.com/qiyuey/harness-skills
+codex plugin install harness-skills
+```
 
 ### Single skill
 
