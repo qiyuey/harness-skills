@@ -3,7 +3,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-d97757)](https://github.com/qiyuey/harness-skills)
 [![Codex](https://img.shields.io/badge/Codex-plugin-412991)](https://github.com/qiyuey/harness-skills)
 [![evals](https://img.shields.io/badge/evals-L1_PASS_·_L2_6%2F6_·_L3_18%2F18-2ea44f)](evals/README.md)
-[![license](https://img.shields.io/badge/license-Anti%20996-blue)](LICENSE)
+[![License](https://img.shields.io/badge/license-Anti--996-blue)](https://github.com/996icu/996.ICU)
 
 面向 AI agent（Claude Code / Codex）的通用 **LLM 工作流 harness 方法论**。
 
