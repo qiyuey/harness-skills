@@ -61,11 +61,28 @@ At runtime, `harness-fix` / `harness-build` Read the adapter first to pick up pr
 - Provides **no** generic QC scripts — concrete QC belongs to the consuming project or its adapter.
 - Does **not** replace a project's local adapter.
 
+## Quality / evals
+
+The skills ship with a 3-layer eval suite in `evals/` (see `evals/README.md`). Because these are **methodology** skills with no runtime code, the pyramid is adapted:
+
+| layer | tests | LLM? | run |
+|-------|-------|------|-----|
+| **L1 Lint** | SKILL.md self-compliance: frontmatter rules, zero domain residue, intact cross-refs, **instruction-polarity self-audit (dogfooding)** | no | `python3 evals/scripts/run_evals.py --layer l1` |
+| **L2 Behavioral** | feed a workflow SKILL.md with planted defects to `harness-review`, assert it catches them | yes (`claude` CLI) | `--layer l2` |
+| **L3 Trigger** | three-skill routing accuracy + mutual exclusivity | yes (`claude` CLI) | `--layer l3` |
+
+Latest run: **L1 PASS · L2 6/6 · L3 18/18 (100% accuracy, 0 cross-skill errors).**
+
+```bash
+python3 evals/scripts/run_evals.py            # all three
+python3 evals/scripts/run_evals.py --layer l1 # zero-LLM, CI default (blocks on fail)
+```
+
 ## Scripts / automation policy
 
-v1 ships **only `SKILL.md` + Markdown references** — no runtime `.py`, no npm workspace, no shared script package. A single skill must work on text methodology after install.
+Skills themselves ship **only `SKILL.md` + Markdown references** — no runtime `.py`, no npm workspace, no shared script package. A single skill must work on text methodology after install.
 
-If v2 needs automation, add a top-level `tools/` or `scripts/` used **only for repo maintenance**, never as a skill runtime dependency.
+The `evals/` directory **is** Python, but it is **repo-maintenance tooling, not a skill runtime dependency** — installing any single skill never pulls in `evals/`. This matches the policy's allowance for maintenance tooling under `tools/`/`scripts/`.
 
 ## Upstream sync (for forks / consuming projects)
 

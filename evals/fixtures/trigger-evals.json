@@ -1,0 +1,23 @@
+[
+  {"query": "帮我审计一下这个多步骤 workflow skill 的 harness 设计，看它能不能扛住中断和部分失败", "expected_skill": "review"},
+  {"query": "review skill initiating-coverage，给我七维评分", "expected_skill": "review"},
+  {"query": "我刚改了 SKILL.md，检查一下有没有文档-实现脱节 --diff-only", "expected_skill": "review"},
+  {"query": "这个 pipeline 的 harness 质量怎么样？能不能断点续做？", "expected_skill": "review"},
+  {"query": "帮我评估几个 skill 哪个 harness 做得最差", "expected_skill": "review"},
+
+  {"query": "chart_11 预测年份全为 null，帮我系统化修复，要防止以后复现", "expected_skill": "fix"},
+  {"query": "QC 脚本报 FAIL 了，做个根因分析", "expected_skill": "fix"},
+  {"query": "这个字段在生产端和消费端命名不一致导致断线，harness-fix 一下", "expected_skill": "fix"},
+  {"query": "用户肉眼发现某数值不对但 QC 没拦住，帮我深挖根因并补前置检测", "expected_skill": "fix"},
+  {"query": "report.json 里 rating 枚举出现了非法值，修一下并保证不再发生", "expected_skill": "fix"},
+
+  {"query": "我要给这个 workflow 加一个新的 sidecar 字段，怎么落地契约+QC+文档", "expected_skill": "build"},
+  {"query": "新增一个 pipeline step，把 ESG 抽取加进 skill 流程", "expected_skill": "build"},
+  {"query": "扩展 schema 加一个 optional 字段，要向后兼容历史产物", "expected_skill": "build"},
+  {"query": "想加一条新的 QC 规则到现有 step，帮我设计实现", "expected_skill": "build"},
+
+  {"query": "WACC 怎么算？DCF 终值增长率一般取多少？", "expected_skill": "none"},
+  {"query": "帮我写个 Python 脚本批量读取 JSON 汇总成表格", "expected_skill": "none"},
+  {"query": "把这份报告的营收预测数字念给我听", "expected_skill": "none"},
+  {"query": "解释一下 EV/EBITDA 和 P/E 的区别", "expected_skill": "none"}
+]

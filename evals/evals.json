@@ -1,0 +1,41 @@
+{
+  "skill_repo": "harness-skills",
+  "version": "1.0",
+  "last_updated": "2026-06-01",
+  "description": "三层评估：L1 lint（SKILL.md 自洽合规，零 LLM）/ L2 behavioral（review 能否检出植入缺陷）/ L3 trigger（三 skill 路由准召+互斥）。",
+
+  "l1_lint": {
+    "runner": "evals/scripts/run_l1_lint.py",
+    "blocks_ci": true,
+    "checks": ["frontmatter 合规", "零领域残留", "交叉引用完整", "指令正向性自审", "渐进披露"]
+  },
+
+  "l2_behavioral": {
+    "runner": "evals/scripts/run_l2_behavioral.py",
+    "evals": [
+      {
+        "id": 1,
+        "name": "l2-review-detects-planted-defects",
+        "target_skill": "harness-review",
+        "fixture": "evals/fixtures/broken_workflow_skill.md",
+        "prompt": "请用 harness-review 的七维框架审计这个 workflow skill 的 harness 设计，逐维给 PASS/FAIL 并说明缺口。",
+        "assertions": [
+          {"dim": "A", "expect": "指出中间状态只活在 LLM 上下文、无结构化 sidecar 持久化"},
+          {"dim": "B", "expect": "指出无 manifest/status 脚本、无法断点续做"},
+          {"dim": "D", "expect": "点名 qc_all.py 是联合 QC（跨读 Step1+Step4），违反单 Step 边界"},
+          {"dim": "D", "expect": "指出 SKILL.md 出现『禁止在某时机运行』警告语是结构缺陷信号"},
+          {"dim": "F", "expect": "指出 API 抓取失败无处理契约"},
+          {"dim": "G", "expect": "点名语言禁令(Korean)与 don't/never 行为负向指令，建议正向改写"}
+        ],
+        "pass_rule": "命中 >=5/6 断言判 PASS"
+      }
+    ]
+  },
+
+  "l3_trigger": {
+    "runner": "evals/scripts/run_l3_trigger.py",
+    "fixtures": "evals/fixtures/trigger-evals.json",
+    "target_accuracy": 0.85,
+    "target_cross_skill_errors": 0
+  }
+}

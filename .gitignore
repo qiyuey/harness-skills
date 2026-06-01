@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .venv/
 tmp/
+
+# eval runner outputs
+evals/workspace/
