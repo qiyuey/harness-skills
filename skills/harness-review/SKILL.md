@@ -1,6 +1,9 @@
 ---
 name: harness-review
 description: Audit any project-level multi-step workflow skill (any SKILL.md describing a Task/Step/phase pipeline) against seven harness-design dimensions — intermediate-state persistence, resume-after-interrupt, partial re-do, programmatic QC, observability/audit-trail, failure-handling contract, instruction polarity. Use when the user asks to audit/review/检查/优化 a workflow skill's harness design, or to score whether it survives long runs, partial failures, and post-mortem investigation. Output a report with PASS/FAIL per dimension and concrete fix suggestions. Skip for single-step snapshot skills and non-workflow files.
+metadata:
+  category: workflow-harness
+  role: review
 ---
 
 # harness-review

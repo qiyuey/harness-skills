@@ -1,6 +1,9 @@
 ---
 name: harness-fix
 description: 对 LLM 工作流（skill/pipeline）中发现的具体 bug 或异常，执行系统化的「根因溯源 → 前置检测 → 修复」三层闭环。触发词：harness-fix、系统化修复、根因分析、前置发现、避免复现、harness问题。与 harness-review 的区别：review 是全量审计（七维度评分），harness-fix 是针对**已知症状**的单点深挖与修复。**不适用场景**：功能空缺/schema 扩展/新功能发现的改进建议，应使用 harness-build。
+metadata:
+  category: workflow-harness
+  role: fix
 ---
 
 # harness-fix

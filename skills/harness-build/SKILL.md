@@ -1,9 +1,9 @@
 ---
 name: harness-build
-description: >
-  为任意多步骤工作流扩展新的契约字段、sidecar 文件、QC 规则或 pipeline step，执行「设计 → 实现 → QC 更新 → 文档同步」闭环。
-  触发词：harness-build、schema/契约扩展、加字段、新功能、新步骤、新 sidecar、把某个流程加入 skill step。
-  与 harness-fix 的区别：fix 修已知 bug，build 落地新功能；若需求其实是修复已暴露异常，应改用 harness-fix。
+description: 为任意多步骤工作流扩展新的契约字段、sidecar 文件、QC 规则或 pipeline step，执行「设计 → 实现 → QC 更新 → 文档同步」闭环。触发词：harness-build、schema/契约扩展、加字段、新功能、新步骤、新 sidecar、把某个流程加入 skill step。与 harness-fix 的区别：fix 修已知 bug，build 落地新功能；若需求其实是修复已暴露异常，应改用 harness-fix。
+metadata:
+  category: workflow-harness
+  role: build
 ---
 
 # harness-build

@@ -14,7 +14,11 @@ Generic **LLM workflow harness methodology** for AI agents (Claude Code / Codex)
 
 ### Routing (no entry skill by design)
 
-With only three skills, the `description` of each already encodes mutually-exclusive triggers, so there is **no `using-harness` router**. Pick directly:
+Per Anthropic's skills guidance, **the `name` + `description` frontmatter is what makes the model decide when to trigger a skill** — routing belongs there, not in a separate dispatcher. Each of the three `description`s already encodes mutually-exclusive triggers and handoffs, so there is **no `using-harness` router**.
+
+> Note: Superpowers' `using-superpowers` is *not* a router — it's a SessionStart **bootstrap** that injects "you have skills, use the Skill tool" into context, justified by its dozens of skills. With three self-describing skills that bootstrap has no payoff here. If this repo grows past ~6 skills, revisit — a `harness-skills-sync` skill (cf. baoyu/qiyuey `hermes-skills-sync` and Superpowers `pulling-updates-from-skills-repository`) is a higher-value 4th skill than an entry router.
+
+Pick directly:
 
 ```
 审计一个多步骤 skill 的 harness 设计      → harness-review
@@ -24,8 +28,6 @@ With only three skills, the `description` of each already encodes mutually-exclu
   • 症状是"已经坏了" → harness-fix
   • 需求是"还没有这个能力" → harness-build
 ```
-
-(If this repo ever grows past ~6 skills, introduce a `using-harness` entry skill then.)
 
 ## Install
 
