@@ -1,30 +1,30 @@
-# Project Harness Adapter — Template
+# 项目 Harness 适配器 —— 模板
 
-Copy this into your project as `.claude/skills/<project>-harness-adapter/SKILL.md` and fill the brackets. The adapter holds everything **specific** to your project that the generic `harness-skills` deliberately leaves out.
+把本模板拷进你的项目，路径为 `.claude/skills/<project>-harness-adapter/SKILL.md`，并填好尖括号内容。适配器承载所有**项目专属**的内容 —— 这些正是通用 `harness-skills` 刻意不包含的部分。
 
 ```markdown
 ---
 name: <project>-harness-adapter
-description: Project-specific harness rules for <project>. Loaded alongside generic harness-review / harness-fix / harness-build to supply this project's real paths, artifact names, QC script names, mandatory-path rules, and concrete failure-case library. Triggers only inside this project.
+description: <project> 的项目专属 harness 规则。与通用 harness-review / harness-fix / harness-build 一同加载，为本项目提供真实路径、产物名、QC 脚本名、强制路径规则与具体失败案例库。仅在本项目内触发。
 ---
 
 # <project>-harness-adapter
 
-Generic methodology lives in the `harness-skills` plugin. This adapter supplies **this project's specifics**.
+通用方法论位于 `harness-skills` 插件中。本适配器提供**本项目的具体信息**。
 
-## Paths & artifacts
-- skills dir: `<.claude/skills>`
-- run/output layout: `<runs/{...}/{...}>`
-- key sidecars: `<list>`
-- QC scripts: `<qc_1.py ... qc_N.py>` and what each checks
-- schema(s): `<schemas/...>`
-- manifest/status entry: `<run_manifest.py status>`
+## 路径与产物
+- skills 目录：`<.claude/skills>`
+- 运行/输出布局：`<runs/{...}/{...}>`
+- 关键 sidecar：`<列出>`
+- QC 脚本：`<qc_1 ... qc_N>` 以及各自检查什么
+- schema：`<schemas/...>`
+- manifest/status 入口：`<run_manifest status>`
 
-## Mandatory rules (this project only)
-- 禁止补丁式修法 / 强制路径 / 跨产物协同约束 等
+## 强制规则（仅本项目）
+- 强制修复纪律 / 强制路径 / 跨产物协同约束 等
 
-## Failure-case library (concrete)
-Real cases observed in this project, mapped to the generic taxonomy in `harness-fix`:
+## 失败案例库（具体）
+本项目观察到的真实案例，映射到 `harness-fix` 中的通用 taxonomy：
 
 | 抽象类型（harness-fix taxonomy） | 本项目真实案例 | 根因文件:行 | 修复 |
 |----------------------------------|----------------|-------------|------|
@@ -32,4 +32,4 @@ Real cases observed in this project, mapped to the generic taxonomy in `harness-
 | QC 覆盖盲区 | <真实症状> | <qc file> | <fix> |
 ```
 
-Keep this adapter the single place where project-specific knowledge accrues, so the generic skills never get polluted.
+让这个适配器成为项目专属知识唯一的沉淀处，通用 skill 才能始终保持纯净。

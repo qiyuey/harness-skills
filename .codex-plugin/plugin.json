@@ -1,7 +1,7 @@
 {
   "name": "harness-skills",
   "version": "0.1.0",
-  "description": "Generic LLM workflow harness methodology: audit, fix, and extend multi-step agent workflows for resumability, programmatic QC, observability, and failure contracts.",
+  "description": "通用 LLM 工作流 harness 方法论：审计、修复并扩展多步骤 agent 工作流，覆盖断点续跑、程序化 QC、可观测性与失败契约。",
   "author": {
     "name": "yuchuan"
   }

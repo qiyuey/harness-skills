@@ -1,120 +1,111 @@
 # harness-skills
 
-**English** · [简体中文](README.zh-CN.md)
-
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-d97757)](https://github.com/qiyuey/harness-skills)
 [![Codex](https://img.shields.io/badge/Codex-plugin-412991)](https://github.com/qiyuey/harness-skills)
 [![evals](https://img.shields.io/badge/evals-L1_PASS_·_L2_6%2F6_·_L3_18%2F18-2ea44f)](evals/README.md)
 [![license](https://img.shields.io/github/license/qiyuey/harness-skills)](LICENSE)
 
-Generic **LLM workflow harness methodology** for AI agents (Claude Code / Codex).
+面向 AI agent（Claude Code / Codex）的通用 **LLM 工作流 harness 方法论**。
 
 ```bash
-# Claude Code — install all three skills as a plugin
+# Claude Code —— 以插件形式安装全部三个 skill
 /plugin marketplace add qiyuey/harness-skills
 /plugin install harness-skills@harness-skills
 ```
 
-"Harness engineering" = wrapping an unreliable LLM into a **stable, recoverable** multi-step workflow. These skills don't judge domain quality (whether the numbers are right, whether the prose is good). They judge whether a workflow **survives interruption, token exhaustion, partial failure, and post-mortem investigation**.
+"Harness 工程" = 把一个不可靠的 LLM 包裹成一个**稳定、可恢复**的多步骤工作流。这些 skill 不评判领域质量（数字是否正确、文笔是否好），它们评判的是一个工作流能否**在中断、token 耗尽、局部失败以及事后复盘排查中存活下来**。
 
-## What's inside
+## 三个 skill
 
-| skill | use when |
-|-------|----------|
-| **harness-review** | Audit a multi-step workflow skill against 7 harness dimensions (state persistence, resume, partial re-do, programmatic QC, observability, failure contract, instruction polarity). Output PASS/FAIL + fixes. |
-| **harness-fix** | A specific bug/anomaly is already known. Run the 3-layer loop: root-cause → guard (QC) → source fix, so it can't recur. |
-| **harness-build** | Add a new contract field / sidecar / QC rule / pipeline step. Run the 4-layer loop: design → implement → QC → docs. |
+| skill | 适用场景 |
+|-------|---------|
+| **harness-review** | 按 7 个 harness 维度审计一个多步骤工作流 skill（状态持久化、断点续跑、局部重做、程序化 QC、可观测性、失败契约、指令极性）。输出 PASS/FAIL + 修复建议。 |
+| **harness-fix** | 已经定位到某个具体 bug/异常。跑 3 层闭环：根因分析 → 加 guard（QC）→ 源头修复，确保不再复发。 |
+| **harness-build** | 新增一个契约字段 / sidecar / QC 规则 / 流水线步骤。跑 4 层闭环：设计 → 实现 → QC → 文档。 |
 
-### Routing (no entry skill by design)
+### 怎么挑
 
-Per Anthropic's skills guidance, **the `name` + `description` frontmatter is what makes the model decide when to trigger a skill** — routing belongs there, not in a separate dispatcher. Each of the three `description`s already encodes mutually-exclusive triggers and handoffs, so there is **no `using-harness` router**.
-
-> Note: Superpowers' `using-superpowers` is *not* a router — it's a SessionStart **bootstrap** that injects "you have skills, use the Skill tool" into context, justified by its dozens of skills. With three self-describing skills that bootstrap has no payoff here. If this repo grows past ~6 skills, revisit — a `harness-skills-sync` skill (cf. baoyu/qiyuey `hermes-skills-sync` and Superpowers `pulling-updates-from-skills-repository`) is a higher-value 4th skill than an entry router.
-
-Pick directly:
+三个 skill 各自的 `description` 已编码互斥的触发条件，模型会自动路由；本仓库刻意不设单独的入口/分发 skill。如需手动选择：
 
 ```
-Audit a multi-step skill's harness design          → harness-review
-Fix a known workflow bug, and prevent recurrence   → harness-fix
-Add a field / sidecar / QC rule / step             → harness-build
-Not sure if it's fix or build?
-  • Symptom is "already broken"        → harness-fix
-  • Need is "this capability is missing yet" → harness-build
+审计一个多步骤 skill 的 harness 设计      → harness-review
+修复一个已知的 workflow bug，且要防复现   → harness-fix
+新增字段 / sidecar / QC 规则 / step       → harness-build
+
+不确定是 fix 还是 build？
+  • 症状是"已经坏了"     → harness-fix
+  • 需求是"还没有这个能力" → harness-build
 ```
 
-## Install
+## 安装
 
-### Full plugin (all three skills)
+### 完整插件（全部三个 skill）
 
-This repo doubles as its own plugin marketplace. Skills are auto-discovered from `skills/`.
+本仓库本身就是它自己的插件市场（marketplace），skill 从 `skills/` 自动发现。
 
-**Claude Code** (reads `.claude-plugin/plugin.json`):
+**Claude Code**（读取 `.claude-plugin/plugin.json`）：
 
 ```bash
 /plugin marketplace add qiyuey/harness-skills
 /plugin install harness-skills@harness-skills
 ```
 
-**Codex CLI** (reads `.codex-plugin/plugin.json`):
+**Codex CLI**（读取 `.codex-plugin/plugin.json`）：
 
 ```bash
 codex plugin marketplace add https://github.com/qiyuey/harness-skills
 codex plugin install harness-skills
 ```
 
-### Single skill
+### 单个 skill
 
-Copy one skill folder into your project's `.claude/skills/`:
+把某个 skill 目录拷进你项目的 `.claude/skills/`：
 
 ```bash
 cp -r harness-skills/skills/harness-review /path/to/project/.claude/skills/
 ```
 
-Each skill works on text methodology alone — no runtime Python, no shared script package.
+每个 skill 仅靠纯文本方法论即可工作 —— 不需要运行时脚本，没有共享脚本包。
 
-### Using with a project adapter
+### 配合项目适配器（adapter）使用
 
-This repo stays **generic**. Project-specific rules (paths, artifact names, QC script names, real failure cases) live in a **local adapter skill** in the consuming project, e.g.:
+本仓库保持**通用**。项目专属的规则（路径、产物名、QC 脚本名、真实失败案例）应放在消费方项目中的一个**本地适配器 skill** 里，例如：
 
 ```
 <project>/.claude/skills/<project>-harness-adapter/SKILL.md
 ```
 
-At runtime, `harness-fix` / `harness-build` Read the adapter first to pick up project paths and the project's real failure-case library, then apply the generic methodology here. See `docs/adapter-template.md` for a starter.
+运行时，`harness-fix` / `harness-build` 会先读取适配器以获取项目路径和项目真实的失败案例库，然后再套用本仓库的通用方法论。起步模板见 [`docs/adapter-template.md`](docs/adapter-template.md)。
 
-## Non-goals
+## 非目标（Non-goals）
 
-- Not a domain framework (not equity research, not any vertical).
-- Provides **no** generic QC scripts — concrete QC belongs to the consuming project or its adapter.
-- Does **not** replace a project's local adapter.
+- 不是领域框架（不针对任何垂直行业）。
+- **不**提供通用 QC 脚本 —— 具体的 QC 属于消费方项目或其适配器。
+- **不**替代项目的本地适配器。
 
-## Quality / evals
+## 质量 / evals
 
-The skills ship with a 3-layer eval suite in `evals/` (see `evals/README.md`). Because these are **methodology** skills with no runtime code, the pyramid is adapted:
+skill 自带一套 3 层 eval 套件，位于 `evals/`（详见 [`evals/README.md`](evals/README.md)）。因为这些是**方法论** skill、没有运行时代码，测试金字塔做了相应调整：
 
-| layer | tests | LLM? | run |
-|-------|-------|------|-----|
-| **L1 Lint** | SKILL.md self-compliance: frontmatter rules, zero domain residue, intact cross-refs, **instruction-polarity self-audit (dogfooding)** | no | `python3 evals/scripts/run_evals.py --layer l1` |
-| **L2 Behavioral** | feed a workflow SKILL.md with planted defects to `harness-review`, assert it catches them | yes (`claude` CLI) | `--layer l2` |
-| **L3 Trigger** | three-skill routing accuracy + mutual exclusivity | yes (`claude` CLI) | `--layer l3` |
+| 层级 | 测什么 | 用 LLM? | 运行 |
+|-----|---------|--------|------|
+| **L1 Lint** | SKILL.md 自合规：frontmatter 规则、零领域残留、交叉引用完整、**指令极性自审（吃自己的狗粮）** | 否 | `python3 evals/scripts/run_evals.py --layer l1` |
+| **L2 Behavioral** | 把一份植入了缺陷的工作流 SKILL.md 喂给 `harness-review`，断言它能抓出来 | 是（`claude` CLI） | `--layer l2` |
+| **L3 Trigger** | 三个 skill 的路由准确率 + 互斥性 | 是（`claude` CLI） | `--layer l3` |
 
-Latest run: **L1 PASS · L2 6/6 · L3 18/18 (100% accuracy, 0 cross-skill errors).**
+最近一次运行：**L1 PASS · L2 6/6 · L3 18/18（100% 准确率，0 跨 skill 错误）。**
 
 ```bash
-python3 evals/scripts/run_evals.py            # all three
-python3 evals/scripts/run_evals.py --layer l1 # zero-LLM, CI default (blocks on fail)
+python3 evals/scripts/run_evals.py            # 跑全部三层
+python3 evals/scripts/run_evals.py --layer l1 # 零 LLM，CI 默认（失败即阻断）
 ```
 
-## Scripts / automation policy
+## 脚本策略
 
-Skills themselves ship **only `SKILL.md` + Markdown references** — no runtime `.py`, no npm workspace, no shared script package. A single skill must work on text methodology after install.
+skill 本身只附带 **`SKILL.md` + Markdown 引用**，没有运行时脚本、没有共享脚本包 —— 单个 skill 安装后必须仅靠文本方法论就能工作。
 
-The `evals/` directory **is** Python, but it is **repo-maintenance tooling, not a skill runtime dependency** — installing any single skill never pulls in `evals/`. This matches the policy's allowance for maintenance tooling under `tools/`/`scripts/`.
+`evals/` 目录是仓库维护工具，**不是 skill 的运行时依赖**：安装任意单个 skill 都不会把 `evals/` 拉进来。
 
-## Upstream sync (for forks / consuming projects)
+## License
 
-A consuming project that locally customizes a skill should track this repo as the upstream base and record a sync log, mirroring the `sync-upstream-skill` pattern:
-
-| date | upstream commit (new base) | action | notes |
-|------|----------------------------|--------|-------|
-| 2026-06-01 | (initial) | fork base established | |
+[MIT](LICENSE)

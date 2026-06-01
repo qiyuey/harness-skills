@@ -1,6 +1,6 @@
 {
   "skill_repo": "harness-skills",
-  "version": "1.0",
+  "schema_version": "1.0",
   "last_updated": "2026-06-01",
   "description": "三层评估：L1 lint（SKILL.md 自洽合规，零 LLM）/ L2 behavioral（review 能否检出植入缺陷）/ L3 trigger（三 skill 路由准召+互斥）。",
 
