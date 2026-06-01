@@ -3,7 +3,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-d97757)](https://github.com/qiyuey/harness-skills)
 [![Codex](https://img.shields.io/badge/Codex-plugin-412991)](https://github.com/qiyuey/harness-skills)
 [![evals](https://img.shields.io/badge/evals-L1_PASS_·_L2_6%2F6_·_L3_18%2F18-2ea44f)](evals/README.md)
-[![license](https://img.shields.io/github/license/qiyuey/harness-skills)](LICENSE)
+[![license](https://img.shields.io/badge/license-Anti%20996-blue)](LICENSE)
 
 面向 AI agent（Claude Code / Codex）的通用 **LLM 工作流 harness 方法论**。
 
@@ -138,4 +138,4 @@ skill 本身只附带 **`SKILL.md` + Markdown 引用**，没有运行时脚本�
 
 ## License
 
-[MIT](LICENSE)
+[Anti 996 License v1.0](LICENSE)（基于 [996.ICU](https://github.com/996icu/996.ICU)）—— 使用本项目即承诺遵守所在司法辖区的劳动法,不得违反 996 工作制。
