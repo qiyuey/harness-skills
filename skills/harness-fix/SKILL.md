@@ -59,7 +59,7 @@ metadata:
 | **跨字段内部不一致** | 同一产物内多个字段不满足应有的恒等关系 | 各字段来自不同代码路径，未做跨字段一致性验证 |
 | **内容越界** | 某 section 包含了应属于另一 section 的内容 | 撰写指引只定义"写什么"，未定义"禁止写什么"；无内容边界 QC |
 | **透传字段名偏离 schema** | 数据点缺失 / 轴空白 / key 与 data 不匹配 | LLM 写入时字段名与脚本约定不一致；脚本透传不校验字段名，QC 无法前置拦截 |
-| **调用参数文档缺失** | 示例命令缺必填参数直接 exit；或枚举值直觉与实际不符 | 脚本 argparse 定义了 required 参数，但 SKILL.md 示例只写部分；枚举白名单只在 schema 里，文档无内联 |
+| **调用参数文档缺失** | 示例命令缺必填参数直接退出；或枚举值直觉与实际不符 | 脚本声明了必填参数，但 SKILL.md 示例只写部分；枚举白名单只在 schema 里，文档无内联 |
 | **helper 语义与 QC 不一致** | 同一业务概念在 helper 与 QC 中实现不同，导致 QC FAIL | 同一概念在 helper 和 QC 中有不同实现，根因是某一侧逻辑缺业务依据 |
 | **schema-script-QC 三角不对齐** | schema 新增字段后 QC 没跟上，或 script 写入字段名与 schema 不一致 | schema（唯一真理来源）、生成脚本、QC 脚本三者独立演化，无强制同步机制 |
 
@@ -141,7 +141,7 @@ find . -maxdepth 5 \( -name postmortem.md -o -name postmortem.json -o -name moni
 
 ### Step 1：根因溯源（Root Cause Analysis）
 
-**不允许把猜测当根因**，必须通过工具验证；但允许先提出候选根因，再用 grep / 最小复现 / py_compile / QC 注入测试证伪或确认。
+**不允许把猜测当根因**，必须通过工具验证；但允许先提出候选根因，再用 grep / 最小复现 / 语法编译检查 / QC 注入测试证伪或确认。
 
 **1.1 失败链路追踪** — 画出问题的完整传递路径：
 
@@ -152,27 +152,27 @@ find . -maxdepth 5 \( -name postmortem.md -o -name postmortem.json -o -name moni
 **1.2 关键溯源工具**
 
 ```bash
-# 定位字段名来源（所有读取点）
-grep -rn 'get("<field>' <scripts-dirs>
+# 定位字段名来源（所有读取点）— 模式按目标语言的取值写法调整
+grep -rn "<field>" <source-dirs>
 
-# 定位字段名定义（所有写入点）
-grep -rn '"<field>' . | grep -v ".pyc"
+# 定位字段名定义（所有写入点）— 排除构建产物/缓存目录
+grep -rn "<field>" . | grep -v "<build-or-cache-dir>"
 
 # 比对文档与实现
 grep -n "<field>" SKILL.md          # 文档侧
-grep -n "<field>" <scripts>/qc_*.py # 实现侧
+grep -n "<field>" <qc-sources>      # 实现侧
 ```
 
 **1.3 schema-script-QC 三角 coverage 检查**（适用于"三角不对齐"失败模式）
 
 ```bash
-# Step A：提取 schema 中所有必填字段名
-python3 -c "import json,sys; s=json.load(open(sys.argv[1])); print(list(s.get('required',[])))" <schema.json>
-# Step B：检查 script 写入了哪些字段名
-grep -n '"<field>"' <scripts>/*.py
+# Step A：提取 schema 中所有必填字段名（用你环境里能解析该 schema 的方式，
+#         如任意 JSON/YAML query 工具，或目标语言的一段读取代码）
+# Step B：检查生成端写入了哪些字段名
+grep -n "<field>" <source-dirs>
 # Step C：检查 QC 覆盖了哪些字段名
-grep -n '"<field>"' <scripts>/qc_*.py
-# Step D：三角对比——schema 定义的字段，在 script 和 QC 中是否都出现？
+grep -n "<field>" <qc-sources>
+# Step D：三角对比——schema 定义的字段，在生成端和 QC 中是否都出现？
 ```
 
 **判定规则**：
@@ -216,48 +216,47 @@ QC 盲区：[哪个 QC 脚本应当拦截但没有]
 
 **QC 不允许做的事**：
 - ❌ 在 QC 里"修复"数据（QC 是检测器，不是修复器）
-- ❌ 吞掉异常（`except: pass`）
-- ❌ 对已知问题写 `try/except` 绕过
+- ❌ 吞掉异常 / 静默 catch（让错误无声通过）
+- ❌ 对已知问题包一层 catch 绕过
 
 #### 层3：修复生成端（代码直接修复）
 
-**找到最初产生错误的代码行**，直接修复，不在下游加转换层：
+**找到最初产生错误的代码行**，直接修复，不在下游加转换层（伪代码，落到目标语言）：
 
-```python
+```text
 # ❌ 错误：在消费端加兼容（别名越来越多）
-val = d.get("field_v1") or d.get("field_v2") or d.get("field")
+val = read(field_v1) or read(field_v2) or read(field)
 
 # ✅ 正确：在生产端统一字段名，消费端只读一个（与 schema 对齐）
+val = read(field)   # 全链路同名
 ```
 
-**访问方式**：`dict["key"]` → `dict.get("key")`（字段缺失返回 None 而非 KeyError，方便 QC 检出）；但 None 最终必须被 QC 拦截，不得静默传播到产出物。
+**访问方式**：字段缺失时应返回"空值/缺失标记"而非抛硬错误，方便 QC 检出（多数语言都有"安全取值"写法）；但该空值最终必须被 QC 拦截，不得静默传播到产出物。
 
 ---
 
 ### Step 3：回归验证
 
-**3.1 正向验证**（修复有效）
+**3.1 正向验证**（修复有效）— 用目标项目的 QC 入口对真实/最小产物跑一遍，确认 PASS：
 ```bash
-python3 path/to/relevant_qc.py path/to/target_artifact_or_run_dir
+<run-qc-command> <target-artifact-or-run-dir>   # 读 exit code，0=PASS
 ```
 
 **3.2 注入测试**（QC 能检出"坏数据"）——每次层2修复原则上都要做；若目标 QC 依赖外部行情/网络/大型真实产物，至少做隔离 smoke test 并在最终说明限制。
 
-```python
-# 标准注入测试模板：tempfile 隔离环境，注入坏数据，断言 QC FAIL，不污染真实产物
-import json, tempfile, subprocess
-from pathlib import Path
+注入测试的不变量（语言无关）：
 
-tmp = Path(tempfile.mkdtemp())
-# 注入触发 bug 的最小坏数据（故意缺某必填字段）
-(tmp / "artifact.json").write_text(json.dumps({"...": "..."}))
+1. 在**隔离的临时目录**里构造产物（不污染真实产物目录）
+2. 注入触发 bug 的**最小坏数据**（如故意缺某必填字段）
+3. 调用 QC 入口，**断言它返回失败退出码**（坏数据必须被拦下）
+4. 断言失败信息里点名了该字段/规则
 
-result = subprocess.run(
-    ["python3", "path/to/relevant_qc.py", str(tmp) + "/"],
-    capture_output=True, text=True
-)
-assert result.returncode != 0, "QC 应当 FAIL 但返回了 PASS"
-print("✅ 注入测试通过")
+```text
+tmp = make_temp_dir()
+write(tmp/"artifact", minimal_bad_payload)        # 故意缺某必填字段
+exit_code, stderr = run_qc(tmp)
+assert exit_code != 0                              # QC 必须 FAIL
+assert "<field>" in stderr                          # 且点名该字段
 ```
 
 注入测试失败（QC 没检出）说明层2修复不完整，必须加强 QC 再重测。
@@ -273,7 +272,7 @@ print("✅ 注入测试通过")
 | 沉淀类型 | 触发条件 | 产出形式 |
 |---------|---------|---------|
 | **更新契约文档** | schema/接口/时序规则变化 | README / task reference / 被修复 skill 的 SKILL.md |
-| **更新 QC 脚本** | 发现新的 QC 盲区 | `qc_N.py` 新增检查项 |
+| **更新 QC 脚本** | 发现新的 QC 盲区 | 对应 QC 脚本新增检查项 |
 | **更新 memory** | 行为约束（非代码）需在未来会话生效 | 项目的 agent memory 目录（路径以当前环境为准，先用工具确认） |
 | **添加回归测试** | 高频失败模式（已出现 2 次以上）| `tests/` 或 `evals/` 新增 golden fixture |
 | **更新项目 adapter 案例库** | 出现该项目特有的新失败案例 | 该项目 harness adapter skill 的失败案例小节 |

@@ -104,9 +104,9 @@ find <schemas-dir> <scripts-dir> -maxdepth 4 -type f | grep -E "(schema|README|q
 
 ```bash
 # 用现有真实或最小样例确认仍 PASS（读 exit code）
-python3 path/to/relevant_qc.py path/to/valid_fixture_or_artifact
+<run-qc-command> <valid-fixture-or-artifact>
 # 注入非法值确认能检出 WARNING/FAIL（真跑，不得跳过）
-python3 path/to/relevant_qc.py path/to/bad_fixture_or_temp_artifact
+<run-qc-command> <bad-fixture-or-temp-artifact>
 ```
 
 ---
@@ -125,13 +125,10 @@ python3 path/to/relevant_qc.py path/to/bad_fixture_or_temp_artifact
 
 文档同步后，优先做可重复、低成本的 smoke test；只有用户明确要求或风险很高时，才重跑完整昂贵 workflow。
 
-```bash
-# 轻量 smoke（推荐）
-python3 -m py_compile <scripts>/changed_file.py
-python3 - <<'PY'
-# 直接 import 新 helper / 构造最小样例 / 跑相关 QC
-PY
-```
+轻量 smoke（推荐，按目标语言落地）：
+- 对改动的源文件做**语法/编译检查**（编译型语言编译、解释型语言做 parse/lint）
+- **加载新 helper + 构造最小样例**，确认能产出预期结构
+- 对该最小样例**跑相关 QC**，确认 PASS
 
 ---
 

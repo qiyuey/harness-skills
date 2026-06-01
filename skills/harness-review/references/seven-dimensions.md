@@ -26,7 +26,7 @@
 
 | 等级 | 标志 |
 |------|------|
-| ✅ PASS | 有 manifest 脚本（如 `run_manifest.py status`）扫描产物推断状态，**不依赖手动维护的状态文件** |
+| ✅ PASS | 有 manifest/status 命令（如 `<run-manifest> status`）扫描产物推断状态，**不依赖手动维护的状态文件** |
 | ❌ FAIL | 以下任一：没有续做概念、重跑等于覆盖、仅靠"如已存在则跳过"的隐式约定而无统一状态查询入口 |
 
 **反例**：
@@ -66,8 +66,8 @@
 
 **检查方法**：
 ```bash
-# 检查 QC 脚本是否跨 Task 读取产物
-grep -n "open\|json.load\|read_text" <scripts-dir>/qc_*.py
+# 检查 QC 脚本是否跨 Task 读取产物（文件读取模式按目标语言调整）
+grep -rn "<file-read-pattern>" <qc-sources>
 # 检查 SKILL.md 是否有时机警告语
 grep -n "禁止在.*时机\|禁止在.*运行\|不.*时候.*运行" SKILL.md
 ```

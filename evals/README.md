@@ -36,6 +36,7 @@ python3 evals/scripts/run_evals.py --layer l3
 | **frontmatter 合规** | name kebab-case ≤64；description ≤1024 且无尖括号；顶层 key ∈ {name,description,license,allowed-tools,metadata,compatibility} | anthropics/skills quick_validate.py |
 | **零领域残留** | skills/ 下不得出现金融词（ebitda/financial_snapshot/AKShare/IRR/rs_competition…）或绝对用户路径 | 通用库纯粹性约束 |
 | **交叉引用完整** | SKILL.md 中引用的 `references/*.md` 文件必须存在 | 防文档悬空引用 |
+| **语言中立** | skill 本体不得耦合具体编程语言（python3/.py/argparse/import 等）；方法论必须语言无关 | 通用库纯粹性约束 |
 | **指令正向性自审** | harness-review 自己定义了"禁止行为/风格类负向指令"——三个 skill 自身的行为/风格类负向指令应当受控（吃自己的狗粮） | harness-review 维度 G |
 | **渐进披露** | SKILL.md body 行数告警阈值（建议 <500）；>300 行的 reference 应有目录 | anthropics 渐进披露 |
 

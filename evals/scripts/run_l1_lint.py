@@ -27,6 +27,15 @@ FORBIDDEN_TERMS = [
     "/users/yuchuan", "/home/", "中芯国际", "valuation_output",
 ]
 
+# 语言中立：skill 本体不得耦合具体编程语言（方法论必须语言无关）。
+# 用正则避免误伤（如 "policy" 含 "py"）。命中即 FAIL。
+LANGUAGE_COUPLING_PATTERNS = [
+    r"\bpython3?\b", r"\bpy_compile\b", r"\bargparse\b", r"\bsubprocess\b",
+    r"\btempfile\b", r"\bimport json\b", r"\bjson\.load\b", r"\bsys\.argv\b",
+    r"\.pyc?\b", r"```python\b", r"```(?:js|javascript|typescript|go|rust|java)\b",
+    r"\bnpm\b", r"\bpip install\b",
+]
+
 # 行为/风格类负向指令模式（指令正向性自审，dogfooding 维度 G）。
 # 仅匹配"行为/风格"类；内容边界类（带 QC 配套的）由人工豁免，见 ALLOWLIST。
 NEGATIVE_PATTERNS = [
@@ -83,6 +92,17 @@ def lint_skill(skill_md: Path) -> list[dict]:
     hits = [t for t in FORBIDDEN_TERMS if t in lower]
     if hits:
         findings.append({"check": "no-domain-residue", "level": "FAIL", "msg": f"领域残留: {hits}"})
+
+    # ---- 语言中立（skill 本体不耦合具体编程语言）----
+    lang_hits = []
+    for i, line in enumerate(text.splitlines(), 1):
+        for pat in LANGUAGE_COUPLING_PATTERNS:
+            if re.search(pat, line, re.I):
+                lang_hits.append(f"L{i}: {line.strip()[:60]}")
+                break
+    if lang_hits:
+        findings.append({"check": "language-neutral", "level": "FAIL",
+                         "msg": f"语言耦合 {len(lang_hits)} 处: " + " | ".join(lang_hits[:3])})
 
     # ---- 交叉引用完整 ----
     for ref in re.findall(r"references/([A-Za-z0-9_\-]+\.md)", text):

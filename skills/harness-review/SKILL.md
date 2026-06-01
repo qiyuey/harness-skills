@@ -154,7 +154,7 @@ Read 该 SKILL.md 完整内容。如果是 symlink，沿链接读到真实文件
 - 评估范围限于 harness 工程质量（A-G 七维）；域质量问题转交该项目对应的 domain review skill 或人工判断
 - 审计报告直接输出到对话；仅当用户明确说「按建议修复」时才修改 skill 文件
 - 每个 finding 都引用 SKILL.md 具体行号或原文摘录
-- 改进建议写到文件级：如「新增 qc_xxx.py 校验 Y 字段」
+- 改进建议写到文件级：如「新增一个 QC 脚本校验 Y 字段」
 
 ---
 
