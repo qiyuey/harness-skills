@@ -1,5 +1,7 @@
 # harness-skills
 
+**English** · [简体中文](README.zh-CN.md)
+
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-d97757)](https://github.com/qiyuey/harness-skills)
 [![Codex](https://img.shields.io/badge/Codex-plugin-412991)](https://github.com/qiyuey/harness-skills)
 [![evals](https://img.shields.io/badge/evals-L1_PASS_·_L2_6%2F6_·_L3_18%2F18-2ea44f)](evals/README.md)
@@ -13,7 +15,7 @@ Generic **LLM workflow harness methodology** for AI agents (Claude Code / Codex)
 /plugin install harness-skills@harness-skills
 ```
 
-"Harness engineering" = wrapping an unreliable LLM into a **stable, recoverable** multi-step workflow. These skills don't judge domain quality (是否数字对、文笔好). They judge whether a workflow **survives interruption, token exhaustion, partial failure, and post-mortem investigation**.
+"Harness engineering" = wrapping an unreliable LLM into a **stable, recoverable** multi-step workflow. These skills don't judge domain quality (whether the numbers are right, whether the prose is good). They judge whether a workflow **survives interruption, token exhaustion, partial failure, and post-mortem investigation**.
 
 ## What's inside
 
@@ -32,12 +34,12 @@ Per Anthropic's skills guidance, **the `name` + `description` frontmatter is wha
 Pick directly:
 
 ```
-审计一个多步骤 skill 的 harness 设计      → harness-review
-修复一个已知的 workflow bug，且要防复现   → harness-fix
-新增字段 / sidecar / QC 规则 / step       → harness-build
-不确定是 fix 还是 build？
-  • 症状是"已经坏了" → harness-fix
-  • 需求是"还没有这个能力" → harness-build
+Audit a multi-step skill's harness design          → harness-review
+Fix a known workflow bug, and prevent recurrence   → harness-fix
+Add a field / sidecar / QC rule / step             → harness-build
+Not sure if it's fix or build?
+  • Symptom is "already broken"        → harness-fix
+  • Need is "this capability is missing yet" → harness-build
 ```
 
 ## Install
