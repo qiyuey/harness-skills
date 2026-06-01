@@ -1,6 +1,6 @@
 ---
 name: harness-review
-description: 按七个 harness 设计维度审计任意项目级的多步骤工作流 skill（任何描述 Task/Step/阶段流水线的 SKILL.md）—— 中间状态持久化、断点续跑、局部重做、程序化 QC、可观测性/审计轨迹、失败处理契约、指令极性。触发词：harness-review、审计/检查/优化一个 workflow skill 的 harness 设计，或评估它能否在长时运行、局部失败与事后复盘中存活。输出逐维 PASS/FAIL 的报告与具体修复建议。单步快照型 skill 与非工作流文件不适用。
+description: 按 harness 设计维度审计任意项目级的多步骤工作流 skill（任何描述 Task/Step/阶段流水线的 SKILL.md）—— 六个方法论基本面（契约、状态落盘、程序化质检、局部恢复、可审计、可回归）分解为九条可独立打分的审计维度：中间状态持久化、断点续做、部分重做、QC 存在性、QC 依赖边界、指令极性、可观测性/审计轨迹、失败处理契约、可回归评测。触发词：harness-review、审计/检查/优化一个 workflow skill 的 harness 设计，或评估它能否在长时运行、局部失败与事后复盘中存活。输出逐维 PASS/FAIL 的报告与具体修复建议。单步快照型 skill 与非工作流文件不适用。
 metadata:
   category: workflow-harness
   role: review
@@ -17,7 +17,7 @@ metadata:
 ENGINEERING ONLY — EVERY FINDING CITES A LINE.
 ```
 
-- 评估范围严格限于 harness 工程（A-G 七维）；数字对不对、文笔好不好一律转交 domain review。
+- 评估范围严格限于 harness 工程（九条审计维度 A/B/C/D1/D2/D3/E/F/G）；数字对不对、文笔好不好一律转交 domain review。
 - 任何 PASS/FAIL 结论都必须引用 SKILL.md 具体行号或原文摘录，不接受空泛断言。
 - 审计报告只输出到对话；仅当用户明确说"按建议修复"时才改文件。
 
@@ -40,21 +40,23 @@ ENGINEERING ONLY — EVERY FINDING CITES A LINE.
 
 ---
 
-## 七大 harness 维度（摘要）
+## harness 审计维度（摘要）
 
-每个维度对应一种典型 LLM 工作流失败模式。**评分细则、PASS/FAIL 标志、反例与检测命令见 `references/seven-dimensions.md`**——评分前必须 Read 该文件。
+**两层结构**：方法论是给人理解的**六个基本面**；审计要逐条机械打分，每个基本面分解成一个或多个**审计维度**，按"检查对象"切分，保证 MECE（互斥不重叠、合起来不遗漏）。所以基本面 6 个、审计维度更多，不是矛盾，是金字塔的两层。**评分细则、PASS/FAIL 标志、反例与检测命令见 `references/seven-dimensions.md`**——评分前必须 Read 该文件。
 
-| 维度 | 解决的失败 | PASS 一句话标准 |
-|------|----------|----------------|
-| A 中间状态持久化 | 上下文丢失就要从头来 | 每个 Step 落一个结构化 sidecar |
-| B 断点续做 | 重启后无法识别完成进度 | 有 manifest/status 脚本扫描产物推断进度 |
-| C 部分重做 | 局部失败被迫整轮重跑 | SKILL.md 有"删哪些文件触发哪步重做"表 |
-| D 程序化 QC（含依赖边界）| 错误产出未被验出，或 QC 在错误时机触发 | 关键 Step 有配套 QC 脚本，单 Step 输入边界，无"禁止在 X 时机运行"警告 |
-| E 可观测性 / Audit Trail | 事后无法定位为何上次产出有问题 | 每个 sidecar 有时间戳 + 来源/溯源字段 |
-| F 失败处理契约 | 错误时 LLM 即兴发挥，行为不可预测 | 关键失败点有"如果 X 则 Y"显式契约 + 退出码语义 |
-| G 指令正向性 | 负向指令触发 LLM 反讽回弹，被禁行为反而出现 | 行为/风格约束正向化；内容边界负向约束有 QC 配套 |
+| 基本面 | 审计维度 | 解决的失败 | PASS 一句话标准 |
+|--------|---------|----------|----------------|
+| 1 契约先于实现 | F 失败处理契约 | 错误时 LLM 即兴发挥，行为不可预测 | 关键失败点有"如果 X 则 Y"显式契约 + 退出码语义 |
+| 2 状态必须落盘 | A 中间状态持久化 | 上下文丢失就要从头来 | 每个 Step 落一个结构化 sidecar |
+| 3 质检要程序化 | D1 QC 存在性 | 错误产出未被脚本验出 | 关键 Step 有配套 QC 脚本，退出码语义清晰 |
+| | D2 QC 依赖边界 | 联合 QC 让错误延迟暴露 | QC 只读单 Step 产物，无"禁止在 X 时机运行"警告 |
+| | D3 指令极性 | 负向禁令触发反讽回弹或无强制 QC | 行为/风格约束正向化；内容边界负向约束有 QC 配套 |
+| 4 失败要能局部恢复 | B 断点续做 | 重启后无法识别完成进度 | 有 manifest/status 脚本扫描产物推断进度 |
+| | C 部分重做 | 局部失败被迫整轮重跑 | SKILL.md 有"删哪些文件触发哪步重做"表 |
+| 5 过程要可审计 | E 可观测性 / Audit Trail | 事后无法定位为何上次产出有问题 | 每个 sidecar 有时间戳 + 来源/溯源字段 |
+| 6 流水线要可回归 | G 可回归评测 | 改完工作流无法判断变好还是变坏，不敢动 | 有固定回归样本/触发集 + 可重复运行入口 |
 
-**总评规则**：A-G 七维，任一 FAIL → 总评 FAIL；全部 PASS → 总评 PASS。
+**总评规则**：A / B / C / D1 / D2 / D3 / E / F / G 共九条审计维度，任一 FAIL → 总评 FAIL；全部 PASS → 总评 PASS。
 
 ---
 
@@ -72,7 +74,7 @@ ENGINEERING ONLY — EVERY FINDING CITES A LINE.
 3. 若 SKILL.md 某 Step 有新规则但 QC 脚本无对应变动 → 输出：`❌ 文档-实现脱节：{Step N} 描述了规则 X，但 QC 脚本无对应变动`
 4. 无脱节则输出：`✅ diff-only PASS：修改的 {N} 个 Step 均有对应 QC 变动或无需脚本覆盖`
 
-`--diff-only` 模式**不**做七维全量审计，只做 D 维度增量检查。
+`--diff-only` 模式**不**做全量审计，只做 D1/D2/D3 维度增量检查。
 
 ---
 
@@ -103,11 +105,11 @@ Read 该 SKILL.md 完整内容。如果是 symlink，沿链接读到真实文件
 
 ### Step 3：浏览结构
 
-整体浏览 SKILL.md，记录：Step/Task 总数、各步产物名、引用的脚本名。这是七维评分的素材，无需机械 grep，直接读文件即可。
+整体浏览 SKILL.md，记录：Step/Task 总数、各步产物名、引用的脚本名。这是逐维评分的素材，无需机械 grep，直接读文件即可。
 
-### Step 4：七维评分
+### Step 4：逐维评分
 
-**先 Read `references/seven-dimensions.md`**，逐个维度给 ✅ PASS / ❌ FAIL，每项写：
+**先 Read `references/seven-dimensions.md`**，对九条审计维度（A/B/C/D1/D2/D3/E/F/G）逐个给 ✅ PASS / ❌ FAIL，每项写：
 - **现状**（在 SKILL.md 哪里看到的，引用原文 1-2 行）
 - **缺口**（与 PASS 等级差什么）
 - **改进建议**（具体到要新增什么文件/小节，不写空话）
@@ -151,7 +153,7 @@ Read 该 SKILL.md 完整内容。如果是 symlink，沿链接读到真实文件
 **总 Step/Task 数**：{N}
 **总评**：✅ PASS / ❌ FAIL（任一维度 FAIL → 总评 FAIL）
 
-## 维度 A-G（逐个：结论 / 现状 / 缺口 / 改进建议）
+## 审计维度 A/B/C/D1/D2/D3/E/F/G（逐个：结论 / 现状 / 缺口 / 改进建议，按基本面分组）
 
 ## 建议修复优先级
 | P | 改进项 | 预期工作量 | 价值 |
@@ -164,7 +166,7 @@ Read 该 SKILL.md 完整内容。如果是 symlink，沿链接读到真实文件
 
 ## 写作纪律
 
-- 评估范围限于 harness 工程质量（A-G 七维）；域质量问题转交该项目对应的 domain review skill 或人工判断
+- 评估范围限于 harness 工程质量（九条审计维度 A/B/C/D1/D2/D3/E/F/G）；域质量问题转交该项目对应的 domain review skill 或人工判断
 - 审计报告直接输出到对话；仅当用户明确说「按建议修复」时才修改 skill 文件
 - 每个 finding 都引用 SKILL.md 具体行号或原文摘录
 - 改进建议写到文件级：如「新增一个 QC 脚本校验 Y 字段」

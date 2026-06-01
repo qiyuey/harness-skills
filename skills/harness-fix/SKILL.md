@@ -1,6 +1,6 @@
 ---
 name: harness-fix
-description: 对 LLM 工作流（skill/pipeline）中发现的具体 bug 或异常，执行系统化的「根因溯源 → 前置检测 → 修复」三层闭环。触发词：harness-fix、系统化修复、根因分析、前置发现、避免复现、harness问题。与 harness-review 的区别：review 是全量审计（七维度评分），harness-fix 是针对**已知症状**的单点深挖与修复。**不适用场景**：功能空缺/schema 扩展/新功能发现的改进建议，应使用 harness-build。
+description: 对 LLM 工作流（skill/pipeline）中发现的具体 bug 或异常，执行系统化的「根因溯源 → 前置检测 → 修复」三层闭环。触发词：harness-fix、系统化修复、根因分析、前置发现、避免复现、harness问题。与 harness-review 的区别：review 是全量审计（逐维度评分），harness-fix 是针对**已知症状**的单点深挖与修复。**不适用场景**：功能空缺/schema 扩展/新功能发现的改进建议，应使用 harness-build。
 metadata:
   category: workflow-harness
   role: fix
@@ -24,7 +24,7 @@ NO FIX WITHOUT ROOT CAUSE — NO SINGLE-LAYER FIX.
 > **违背流程的字面，就是违背排障的精神。**
 
 > **与 `harness-review` 的区别**：
-> - `harness-review`：全量审计，无症状也能运行，输出七维评分报告
+> - `harness-review`：全量审计，无症状也能运行，输出逐维评分报告
 > - `harness-fix`：有症状驱动，深挖单点，输出可落地的代码级修复
 >
 > **重要**：本 skill 是排障框架，不是任何具体 repo 状态的权威说明。遇到路径、Step 编号、QC 名称、产物结构时，必须先用工具验证；如果本文示例与 repo 不一致，以 repo 为准。
@@ -134,12 +134,12 @@ find . -maxdepth 5 \( -name postmortem.md -o -name postmortem.json -o -name moni
 
 **从 harness-review 报告提取症状的方法**：
 1. 找「建议修复优先级」表，按 P0 → P1 → P2 顺序处理
-2. 对每个 FAIL 项，提取：维度（A-G）+ 缺口描述 + 改进建议
+2. 对每个 FAIL 项，提取：维度（A/B/C/D1/D2/D3/E/F/G）+ 缺口描述 + 改进建议
 3. 将每项映射到本文「失败模式分类表」：
-   - 维度 D FAIL（QC 脚本）→ 通常对应「QC 覆盖盲区」
-   - 维度 D FAIL（依赖边界）→ 对应「联合 QC 导致时机错误」
-   - 维度 G FAIL（行为/风格类）→ 对应「文档-实现脱节」（指令层面）
-   - 维度 G FAIL（内容边界无 QC）→ 对应「内容越界」
+   - 维度 D1 FAIL（QC 脚本缺失）→ 通常对应「QC 覆盖盲区」
+   - 维度 D2 FAIL（依赖边界）→ 对应「联合 QC 导致时机错误」
+   - 维度 D3 FAIL（行为/风格类）→ 对应「文档-实现脱节」（指令层面）
+   - 维度 D3 FAIL（内容边界无 QC）→ 对应「内容越界」
    - 维度 F FAIL → 通常对应「Skill 调用中断主流程」或失败契约缺失
 4. 每项作为独立症状进入 Step 1 溯源
 

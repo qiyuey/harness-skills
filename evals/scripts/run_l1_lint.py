@@ -36,7 +36,7 @@ LANGUAGE_COUPLING_PATTERNS = [
     r"\bnpm\b", r"\bpip install\b",
 ]
 
-# 行为/风格类负向指令模式（指令正向性自审，dogfooding 维度 G）。
+# 行为/风格类负向指令模式（指令正向性自审，dogfooding 维度 D3 指令极性）。
 # 仅匹配"行为/风格"类；内容边界类（带 QC 配套的）由人工豁免，见 ALLOWLIST。
 NEGATIVE_PATTERNS = [
     r"禁止使用.{0,8}语言", r"don't\b", r"\bdo not\b", r"\bnever\b", r"must not",
@@ -109,7 +109,7 @@ def lint_skill(skill_md: Path) -> list[dict]:
         if not (skill_md.parent / "references" / ref).exists():
             findings.append({"check": "cross-ref", "level": "FAIL", "msg": f"悬空引用 references/{ref}"})
 
-    # ---- 指令正向性自审（dogfooding 维度 G）----
+    # ---- 指令正向性自审（dogfooding 维度 D3 指令极性）----
     polarity_hits = []
     for i, line in enumerate(text.splitlines(), 1):
         ll = line.lower()

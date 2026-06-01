@@ -1,6 +1,6 @@
 [
   {"query": "帮我审计一下这个多步骤 workflow skill 的 harness 设计，看它能不能扛住中断和部分失败", "expected_skill": "review"},
-  {"query": "review skill initiating-coverage，给我七维评分", "expected_skill": "review"},
+  {"query": "review skill initiating-coverage，给我各维度评分", "expected_skill": "review"},
   {"query": "我刚改了 SKILL.md，检查一下有没有文档-实现脱节 --diff-only", "expected_skill": "review"},
   {"query": "这个 pipeline 的 harness 质量怎么样？能不能断点续做？", "expected_skill": "review"},
   {"query": "帮我评估几个 skill 哪个 harness 做得最差", "expected_skill": "review"},

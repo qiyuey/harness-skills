@@ -158,5 +158,5 @@ find <schemas-dir> <scripts-dir> -maxdepth 4 -type f | grep -E "(schema|README|q
 | skill | 关系 |
 |-------|------|
 | `harness-fix` | 互斥：fix 修已知 bug，build 落地新功能 |
-| `harness-review` | build 完成后可用 review 审计新增 step/字段是否满足七维 |
+| `harness-review` | build 完成后可用 review 审计新增 step/字段是否满足各审计维度 |
 | 项目 harness adapter | 提供该项目的路径/产物/命名约定；build 时先 Read adapter 对齐项目规则 |
