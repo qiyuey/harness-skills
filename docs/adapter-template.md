@@ -1,12 +1,18 @@
 # 项目 Harness 适配器 —— 模板
 
-把本模板拷进你的项目，路径为 `.claude/skills/<project>-harness-adapter/SKILL.md`，并填好尖括号内容。适配器承载所有**项目专属**的内容 —— 这些正是通用 `harness-skills` 刻意不包含的部分。
+把本模板的内容拷进你的项目，填好尖括号部分。适配器承载所有**项目专属**的内容 —— 这些正是通用 `harness-skills` 刻意不包含的部分。
+
+载体随你选（详见 README「配合项目适配器使用」）：
+
+- **本地适配器 skill**：`.claude/skills/<project>-harness-adapter/SKILL.md`，保留下方 frontmatter。
+- **约定文件**：`AGENTS.md` / `CLAUDE.md` 里的一节，去掉 frontmatter、只留正文即可。
 
 ```markdown
 ---
 name: <project>-harness-adapter
 description: <project> 的项目专属 harness 规则。与通用 harness-review / harness-fix / harness-build 一同加载，为本项目提供真实路径、产物名、QC 脚本名、强制路径规则与具体失败案例库。仅在本项目内触发。
 ---
+（仅当载体是 skill 时需要上面的 frontmatter；写进 AGENTS.md / CLAUDE.md 时删掉它。）
 
 # <project>-harness-adapter
 
@@ -32,4 +38,4 @@ description: <project> 的项目专属 harness 规则。与通用 harness-review
 | QC 覆盖盲区 | <真实症状> | <qc file> | <fix> |
 ```
 
-让这个适配器成为项目专属知识唯一的沉淀处，通用 skill 才能始终保持纯净。
+让适配器（无论以何种载体存在）成为项目专属知识唯一的沉淀处，通用 skill 才能始终保持纯净。

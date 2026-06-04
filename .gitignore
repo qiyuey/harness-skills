@@ -6,3 +6,6 @@ tmp/
 
 # eval runner outputs
 evals/workspace/
+
+# Playwright MCP session scratch
+.playwright-mcp/

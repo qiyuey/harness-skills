@@ -117,15 +117,17 @@ cp -r harness-skills/skills/harness-review /path/to/project/.claude/skills/
 
 每个 skill 仅靠纯文本方法论即可工作 —— 不需要运行时脚本，没有共享脚本包。
 
-### 配合项目适配器（adapter）使用
+### 配合项目适配器（adapter）使用（可选）
 
-本仓库保持**通用**。项目专属的规则（路径、产物名、QC 脚本名、真实失败案例）应放在消费方项目中的一个**本地适配器 skill** 里，例如：
+本仓库保持**通用**，不含任何项目专属信息。如果你的项目有专属规则（路径、产物名、QC 脚本名、真实失败案例），可以把它们沉淀在一处「适配器」里，让 `harness-fix` / `harness-build` 先读到项目语境、再套用本仓库的通用方法论。
 
-```
-<project>/.claude/skills/<project>-harness-adapter/SKILL.md
-```
+适配器**不必是一个 skill**，放在哪取决于你的工作流，常见几种：
 
-运行时，`harness-fix` / `harness-build` 会先读取适配器以获取项目路径和项目真实的失败案例库，然后再套用本仓库的通用方法论。起步模板见 [`docs/adapter-template.md`](docs/adapter-template.md)。
+- **约定文件**：写进项目根的 `AGENTS.md` 或 `CLAUDE.md`——agent 本来就会读到，零额外结构，最轻量。
+- **本地适配器 skill**：单独建一个 `<project>/.claude/skills/<project>-harness-adapter/SKILL.md`，适合规则较多、想按需触发的场景。
+- **直接内联**：项目小、规则少时，运行 skill 时把路径和失败案例当上下文喂进去即可，什么都不用建。
+
+无论落在哪，内容是同一套：项目路径 / 产物命名约定 / 真实失败案例库。起步模板见 [`docs/adapter-template.md`](docs/adapter-template.md)——把里面的字段搬进上述任一载体即可。**不配适配器也能用**，只是 agent 拿不到项目语境，需要你在对话里临时补充。
 
 ## 非目标（Non-goals）
 
@@ -133,7 +135,7 @@ cp -r harness-skills/skills/harness-review /path/to/project/.claude/skills/
 - **不**针对多 Agent 编排 —— 只管单个 agent 把一条长流水线稳定跑完，agent 间的并行 / 协作 / 通信交给编排层（见[适用场景](#适用场景)）。
 - **不**提供运行时或框架 —— 是纯文本方法论，不引入依赖、不绑定 Temporal / LangGraph 一类的执行引擎。
 - **不**提供通用 QC 脚本 —— 具体的 QC 属于消费方项目或其适配器。
-- **不**替代项目的本地适配器。
+- **不**替代项目自己的适配器 —— 项目专属规则由消费方沉淀（skill / `AGENTS.md` / `CLAUDE.md` 皆可），本仓库只提供通用方法论。
 
 ## 质量 / evals
 
