@@ -4,7 +4,7 @@
 
 载体随你选（详见 README「配合项目适配器使用」）：
 
-- **本地适配器 skill**：`.claude/skills/<project>-harness-adapter/SKILL.md`，保留下方 frontmatter。
+- **本地适配器 skill**：`.agents/skills/<project>-harness-adapter/SKILL.md`；如果只给 Claude Code 用，也可以放到 `.claude/skills/<project>-harness-adapter/SKILL.md`。作为 skill 使用时保留下方 frontmatter。
 - **约定文件**：`AGENTS.md` / `CLAUDE.md` 里的一节，去掉 frontmatter、只留正文即可。
 
 ```markdown
@@ -19,7 +19,7 @@ description: <project> 的项目专属 harness 规则。与通用 harness-review
 通用方法论位于 `harness-skills` 插件中。本适配器提供**本项目的具体信息**。
 
 ## 路径与产物
-- skills 目录：`<.claude/skills>`
+- skills 目录：`<.agents/skills 或 .claude/skills>`
 - 运行/输出布局：`<runs/{...}/{...}>`
 - 关键 sidecar：`<列出>`
 - QC 脚本：`<qc_1 ... qc_N>` 以及各自检查什么
