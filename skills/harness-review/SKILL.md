@@ -180,4 +180,4 @@ Read 该 SKILL.md 完整内容。如果是 symlink，沿链接读到真实文件
 | `harness-fix` | 输出端：本 skill 发现的 P0/P1 修复项可直接作为 `harness-fix` 的输入；两者组成"发现→修复"闭环 |
 | 通用 skill review | 审 SKILL.md 写作质量（描述、触发词、结构）；本 skill 专注 harness 设计 |
 | domain review skill | 审领域内容质量；本 skill 只审工程稳定性和可恢复性 |
-| 项目本地 adapter | 提供该项目的具体路径/产物/QC 规则与历史失败案例；本通用 skill 提供方法论框架 |
+| 项目本地 adapter | 提供该项目的具体路径/产物/QC 规则、既有防线与项目经验；本通用 skill 提供方法论框架 |

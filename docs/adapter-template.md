@@ -10,7 +10,7 @@
 ```markdown
 ---
 name: <project>-harness-adapter
-description: <project> 的项目专属 harness 规则。与通用 harness-review / harness-fix / harness-build 一同加载，为本项目提供真实路径、产物名、QC 脚本名、强制路径规则与具体失败案例库。仅在本项目内触发。
+description: <project> 的项目专属 harness 规则。与通用 harness-review / harness-fix / harness-build 一同加载，为本项目提供真实路径、产物名、QC 脚本名、强制路径规则与项目 playbook。仅在本项目内触发。
 ---
 （仅当载体是 skill 时需要上面的 frontmatter；写进 AGENTS.md / CLAUDE.md 时删掉它。）
 
@@ -29,13 +29,21 @@ description: <project> 的项目专属 harness 规则。与通用 harness-review
 ## 强制规则（仅本项目）
 - 强制修复纪律 / 强制路径 / 跨产物协同约束 等
 
-## 失败案例库（具体）
-本项目观察到的真实案例，映射到 `harness-fix` 中的通用 taxonomy：
+## 项目 playbook：失败逃逸与防线
+本节只承载项目专属语境。优先把失败逃逸升级为可执行防线：契约、QC、注入测试、回归 fixture 或 trigger eval。只有暂时无法程序化的经验，才作为案例写在这里。
 
-| 抽象类型（harness-fix taxonomy） | 本项目真实案例 | 根因文件:行 | 修复 |
-|----------------------------------|----------------|-------------|------|
-| 字段名不一致 | <真实字段对> | <file:line> | <fix> |
-| QC 覆盖盲区 | <真实症状> | <qc file> | <fix> |
+### 已程序化的防线
+
+| 抽象类型（harness-fix taxonomy） | 本项目真实症状 | 已升级的防线 | regression hook |
+|----------------------------------|----------------|--------------|-----------------|
+| 字段名不一致 | <真实字段对> | <schema/QC/helper 修复> | <test/eval/fixture> |
+| QC 覆盖盲区 | <真实症状> | <新增 QC + 注入坏样本> | <test/eval/fixture> |
+
+### 暂未程序化的项目经验
+
+| 抽象类型（harness-fix taxonomy） | 本项目经验 | 暂无法程序化原因 | 下次升级入口 |
+|----------------------------------|------------|----------------|--------------|
+| <类型> | <经验> | <原因> | <计划补的 QC/test/eval 或 N/A> |
 ```
 
 让适配器（无论以何种载体存在）成为项目专属知识唯一的沉淀处，通用 skill 才能始终保持纯净。

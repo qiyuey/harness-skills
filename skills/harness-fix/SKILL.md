@@ -20,6 +20,7 @@ NO FIX WITHOUT ROOT CAUSE — NO SINGLE-LAYER FIX.
 - 未完成 Step 1 根因溯源（用工具证实，非猜测），不得提出任何修复。
 - 三层（契约 / 前置检测 / 生成端）必须同时处理；某层 N/A 须用证据说明，不得静默跳过。
 - 治标式补丁（只改生成端、或只加一条 QC 绕过）视为**未修复**。
+- 凡是逃过 harness 的失败，修复时优先升级为可执行防线（契约 / QC / 注入测试 / 回归 fixture）；adapter playbook 只承载暂时无法程序化的项目经验。
 
 > **违背流程的字面，就是违背排障的精神。**
 
@@ -29,7 +30,7 @@ NO FIX WITHOUT ROOT CAUSE — NO SINGLE-LAYER FIX.
 >
 > **重要**：本 skill 是排障框架，不是任何具体 repo 状态的权威说明。遇到路径、Step 编号、QC 名称、产物结构时，必须先用工具验证；如果本文示例与 repo 不一致，以 repo 为准。
 >
-> **项目失败案例**：本文的失败模式分类表是**抽象 taxonomy**。具体项目的真实失败案例（字段名、路径、QC 名称）应放在该项目的 harness adapter skill 里；执行时若存在 adapter，先 Read adapter 的案例库再溯源。
+> **项目 playbook**：本文的失败模式分类表是**抽象 taxonomy**。具体项目的真实语境（字段名、路径、QC 名称、既有防线、暂未程序化经验）应放在该项目的 harness adapter skill 里；执行时若存在 adapter，先 Read adapter 的 playbook 再溯源。
 
 ---
 
@@ -51,6 +52,19 @@ NO FIX WITHOUT ROOT CAUSE — NO SINGLE-LAYER FIX.
 - ❌ 只改层1（写文档）：文档和实现仍然脱节
 - ✅ 三层同时修复，每层都有可验证的产出
 - ✅ 或明确标注某层 N/A，并用证据说明为什么不需要改
+
+**修复即升级原则**：
+修复的默认完成形态是把逃逸原因转成可执行防线，而不是另写一份失败记录。优先级如下：
+
+| 失败暴露的问题 | 修复时直接升级成 |
+|----------------|------------------|
+| 字段名漂移 / schema-script-QC 三角不对齐 | schema coverage 检查、生成端字段统一、QC 同名断言 |
+| QC 没拦住 | 新 QC 规则 + 最小坏样本注入测试 |
+| SKILL.md 误导 agent | 契约文本修正 + L2 behavioral fixture |
+| workflow 误触发 / 串触发 | trigger eval 用例 |
+| 项目路径、命名或历史约定特殊 | adapter 规则；若能程序化，再同步 QC / manifest / helper |
+
+adapter playbook 是兜底：仅当经验暂时无法转成 guard、测试或 eval，才沉淀为项目经验；若已经补了可执行防线，在 adapter 中只需引用对应 regression hook。
 
 ---
 
@@ -286,11 +300,12 @@ assert "<field>" in stderr                          # 且点名该字段
 |---------|---------|---------|
 | **更新契约文档** | schema/接口/时序规则变化 | README / task reference / 被修复 skill 的 SKILL.md |
 | **更新 QC 脚本** | 发现新的 QC 盲区 | 对应 QC 脚本新增检查项 |
+| **添加注入测试** | 新 QC 规则用于拦截某类坏产物 | 隔离最小坏样本 + 断言 QC 失败并点名规则 |
+| **添加回归测试 / eval** | 失败来自通用 harness 缺口、skill 误导或高频失败模式 | `tests/` 或 `evals/` 新增 golden fixture / trigger case / behavioral case |
 | **更新 memory** | 行为约束（非代码）需在未来会话生效 | 项目的 agent memory 目录（路径以当前环境为准，先用工具确认） |
-| **添加回归测试** | 高频失败模式（已出现 2 次以上）| `tests/` 或 `evals/` 新增 golden fixture |
-| **更新项目 adapter 案例库** | 出现该项目特有的新失败案例 | 该项目 harness adapter skill 的失败案例小节 |
+| **更新项目 adapter playbook** | 项目经验暂时无法程序化，或需要解释既有 guard/eval 背后的项目语境 | 该项目 harness adapter skill 的项目 playbook 小节，引用对应 guard / regression hook |
 
-> ⚠️ 默认不要在普通业务修复中修改本文件（harness-fix/SKILL.md）。只有当用户明确要求优化 harness skill，或本文件本身的过期说明正在误导修复流程时，才可小范围修订。
+> 普通业务修复优先修改目标项目的契约、QC、生成端和回归样本。只有当用户明确要求优化 harness skill，或本文件本身的过期说明正在误导修复流程时，才小范围修订本文件（harness-fix/SKILL.md）。
 
 ### Step 5：最终汇报
 
@@ -326,5 +341,5 @@ harness-fix --file <path/to/script>           # 针对特定文件做三层审�
 |-------|------|
 | `harness-review` | 输入端：harness-review 输出的 P0/P1 修复项可直接作为 harness-fix 的输入 |
 | `harness-build` | 互斥：build 落地新功能，fix 修已知 bug；若需求其实是新增能力，改用 harness-build |
-| 项目 harness adapter | 提供该项目的真实失败案例、路径与 QC 名称；溯源前先 Read adapter 案例库 |
+| 项目 harness adapter | 提供该项目的路径、QC 名称、既有防线与暂未程序化经验；溯源前先 Read adapter playbook |
 | 域质量 review skill | 负责内容/业务判断；harness-fix 只处理工程稳定性、契约、QC、恢复能力 |

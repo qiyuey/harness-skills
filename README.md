@@ -61,7 +61,7 @@ cp -R skills/* ~/.claude/skills/
 - 需要审计 workflow 设计时用 `harness-review`。
 - 已知 bug / 异常 / 失败症状需要系统修复时用 `harness-fix`。
 - 新增字段、sidecar、QC 规则或 pipeline step 时用 `harness-build`。
-- 项目专属路径、产物名、QC 脚本和失败案例不要写进通用 skill；放进消费方项目的 adapter、`AGENTS.md` 或 `CLAUDE.md`。
+- 项目专属路径、产物名、QC 脚本和项目 playbook 放进消费方项目的 adapter、`AGENTS.md` 或 `CLAUDE.md`，通用 skill 保持纯净。
 - 不要把 `evals/` 当作 skill 运行时依赖。
 
 ## 这个仓库解决什么
@@ -115,13 +115,13 @@ LLM 长链路工作流常见的问题不是“模型不会写”，而是流程�
 
 ## 项目适配器
 
-本仓库保持通用，不包含任何消费方项目的路径、产物命名、QC 脚本名或真实失败案例。项目专属信息建议沉淀到一个 adapter，让 `harness-fix` / `harness-build` 先读到本项目语境，再套用通用方法论。
+本仓库保持通用，不包含任何消费方项目的路径、产物命名、QC 脚本名或项目 playbook。项目专属信息建议沉淀到一个 adapter，让 `harness-fix` / `harness-build` 先读到本项目语境，再套用通用方法论。
 
 adapter 可以放在三种地方：
 
 - **约定文件**：写进项目根的 `AGENTS.md` 或 `CLAUDE.md`。最轻量，适合规则少的项目。
 - **本地 adapter skill**：放到 `<project>/.agents/skills/<project>-harness-adapter/SKILL.md`；只给 Claude Code 用时可放到 `<project>/.claude/skills/<project>-harness-adapter/SKILL.md`。
-- **对话内联**：项目很小时，直接在运行 skill 时把路径、产物名、失败案例告诉 agent。
+- **对话内联**：项目很小时，直接在运行 skill 时把路径、产物名、项目经验告诉 agent。
 
 模板见 [docs/adapter-template.md](docs/adapter-template.md)。
 
@@ -142,7 +142,7 @@ harness-build 扩展新契约、新 QC 或新步骤
 harness-review 复检
 ```
 
-沉淀的落点属于消费方项目或 adapter：QC 脚本、回归 fixture、失败案例库、项目规则文档。本仓库只提供通用方法论，不接管你的项目实现。
+沉淀的落点属于消费方项目或 adapter：优先升级为 QC 脚本、注入测试、回归 fixture、trigger/behavioral eval 或项目规则文档；暂时无法程序化的项目经验再进入 adapter playbook。本仓库只提供通用方法论，不接管你的项目实现。
 
 ## 质量与验证
 
