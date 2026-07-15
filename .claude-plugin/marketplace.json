@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "harness-skills",
+  "description": "Explicitly invoked methods for reliable Agent Skill harness workflows",
+  "owner": {
+    "name": "yuchuan"
+  },
+  "plugins": [
+    {
+      "name": "harness-skills",
+      "description": "Audit, repair, and extend recoverable Agent Skill harness workflows",
+      "version": "0.1.2",
+      "author": {
+        "name": "yuchuan"
+      },
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/qiyuey/harness-skills"
+    }
+  ]
+}

@@ -11,6 +11,8 @@
 
 新用户优先安装完整插件。插件会一次性提供三个 skill：`harness-review`、`harness-fix`、`harness-build`。如果你的工具不支持插件，也可以用通用目录安装。
 
+仓库同时提供 Codex 的 `.agents/plugins/marketplace.json` 与 Claude Code 的 `.claude-plugin/marketplace.json`，下面的 GitHub marketplace 安装命令可直接使用。
+
 ### Codex CLI
 
 插件安装：
