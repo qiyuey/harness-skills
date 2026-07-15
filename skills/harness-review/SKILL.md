@@ -1,6 +1,7 @@
 ---
 name: harness-review
-description: 按 harness 设计维度审计任意项目级的多步骤工作流 skill（任何描述 Task/Step/阶段流水线的 SKILL.md）—— 六个方法论基本面（契约、状态落盘、程序化质检、局部恢复、可审计、可回归）分解为九条可独立打分的审计维度：中间状态持久化、断点续做、部分重做、QC 存在性、QC 依赖边界、指令极性、可观测性/审计轨迹、失败处理契约、可回归评测。触发词：harness-review、审计/检查/优化一个 workflow skill 的 harness 设计，或评估它能否在长时运行、局部失败与事后复盘中存活。输出逐维 PASS/FAIL 的报告与具体修复建议。单步快照型 skill 与非工作流文件不适用。
+description: 仅在用户显式调用 harness-review（Codex `$harness-review` 或 Claude Code `/harness-review`）时使用。审计通过 Agent Skill 执行的长时、多步骤、可恢复单 agent harness 工作流，逐维检查状态落盘、断点续做、部分重做、逐步 QC、审计轨迹、失败契约与回归能力。普通代码审查、CI/CD 或 GitHub Actions、业务数据 pipeline、一般软件架构、单步 skill 和非工作流文件不触发。
+disable-model-invocation: true
 metadata:
   category: workflow-harness
   role: review

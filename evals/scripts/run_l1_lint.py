@@ -18,7 +18,11 @@ EVALS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = EVALS_DIR.parent
 SKILLS_DIR = REPO_ROOT / "skills"
 
-ALLOWED_FM_KEYS = {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
+ALLOWED_FM_KEYS = {
+    "name", "description", "license", "allowed-tools", "metadata", "compatibility",
+    # Claude Code 官方平台扩展；与 agents/openai.yaml 的 Codex policy 配对。
+    "disable-model-invocation",
+}
 
 # 领域残留黑名单：通用库不得出现任何金融/项目专属词或绝对用户路径
 FORBIDDEN_TERMS = [
@@ -86,6 +90,21 @@ def lint_skill(skill_md: Path) -> list[dict]:
         findings.append({"check": "frontmatter.description", "level": "FAIL", "msg": "description 含尖括号 <>"})
     if not desc:
         findings.append({"check": "frontmatter.description", "level": "FAIL", "msg": "description 缺失"})
+
+    # ---- 调用策略：harness workflow 必须由用户显式启动 ----
+    claude_policy = re.search(r"^disable-model-invocation:\s*true\s*$", fm, re.M)
+    if not claude_policy:
+        findings.append({"check": "invocation-policy.claude", "level": "FAIL",
+                         "msg": "缺少 disable-model-invocation: true"})
+    openai_yaml = skill_md.parent / "agents" / "openai.yaml"
+    if not openai_yaml.exists():
+        findings.append({"check": "invocation-policy.codex", "level": "FAIL",
+                         "msg": "缺少 agents/openai.yaml"})
+    else:
+        openai_text = openai_yaml.read_text(encoding="utf-8")
+        if not re.search(r"^\s*allow_implicit_invocation:\s*false\s*$", openai_text, re.M):
+            findings.append({"check": "invocation-policy.codex", "level": "FAIL",
+                             "msg": "缺少 policy.allow_implicit_invocation: false"})
 
     # ---- 零领域残留 ----
     lower = text.lower()

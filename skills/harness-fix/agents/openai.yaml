@@ -1,0 +1,5 @@
+interface:
+  display_name: "Harness Fix"
+  short_description: "Repair an Agent Skill harness failure"
+policy:
+  allow_implicit_invocation: false

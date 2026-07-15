@@ -1,0 +1,5 @@
+interface:
+  display_name: "Harness Review"
+  short_description: "Audit a recoverable Agent Skill workflow"
+policy:
+  allow_implicit_invocation: false

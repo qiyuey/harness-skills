@@ -15,7 +15,7 @@ SCRIPTS = Path(__file__).resolve().parent
 LAYERS = {
     "l1": ("run_l1_lint.py", "L1 Lint（SKILL.md 自洽合规，零 LLM）"),
     "l2": ("run_l2_behavioral.py", "L2 Behavioral（review 检出植入缺陷，需 claude CLI）"),
-    "l3": ("run_l3_trigger.py", "L3 Trigger（三 skill 路由准召+互斥，需 claude CLI）"),
+    "l3": ("run_l3_trigger.py", "L3 Trigger（显式路由+普通开发近邻误触发，需 claude CLI）"),
 }
 
 

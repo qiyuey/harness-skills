@@ -10,7 +10,7 @@
 |----|--------|------|------|--------|
 | **L1 Lint** | SKILL.md 自身合规：frontmatter 规范、零领域残留、内部交叉引用完整、**skills 是否遵守自己的指令正向性规则** | <2s | Python 标准库 | 每次改 SKILL.md 后必跑（CI 阻塞） |
 | **L2 Behavioral** | 把"植入已知缺陷的 workflow SKILL.md"喂给 harness-review，断言它能检出这些缺陷 | ~2min | claude CLI | review 逻辑或审计维度细则改动后 |
-| **L3 Trigger** | 三个 skill 的 description 路由准确率 + 互斥性（不串触发） | ~2min | claude CLI | 改任一 description 后 |
+| **L3 Trigger** | 显式调用路由 + 普通开发近邻误触发；每条默认独立运行 3 次 | ~3-5min | claude CLI | 改 description、调用策略或 adapter 入口后 |
 
 ## 快速上手
 
@@ -33,7 +33,8 @@ python3 evals/scripts/run_evals.py --layer l3
 
 | 检查 | 规则 | 来源 |
 |------|------|------|
-| **frontmatter 合规** | name kebab-case ≤64；description ≤1024 且无尖括号；顶层 key ∈ {name,description,license,allowed-tools,metadata,compatibility} | anthropics/skills quick_validate.py |
+| **frontmatter 合规** | name kebab-case ≤64；description ≤1024 且无尖括号；允许通用字段及 Claude Code 官方 `disable-model-invocation` 扩展 | Agent Skills spec + Claude Code skills |
+| **显式调用策略** | 三个 skill 均要求 Claude `disable-model-invocation: true`，且 Codex `agents/openai.yaml` 设置 `allow_implicit_invocation: false` | 防止普通开发误触发 harness workflow |
 | **零领域残留** | skills/ 下不得出现金融词（ebitda/financial_snapshot/AKShare/IRR/rs_competition…）或绝对用户路径 | 通用库纯粹性约束 |
 | **交叉引用完整** | SKILL.md 中引用的 `references/*.md` 文件必须存在 | 防文档悬空引用 |
 | **语言中立** | skill 本体不得耦合具体编程语言（python3/.py/argparse/import 等）；方法论必须语言无关 | 通用库纯粹性约束 |
@@ -50,11 +51,12 @@ python3 evals/scripts/run_evals.py --layer l3
 
 ## L3 Trigger — 路由准确率 + 互斥性
 
-测两件事：
-1. **召回**：该触发的 query 是否触发了**对应**的 skill（review/fix/build 各自的样本）
-2. **互斥**：fix 的样本不应误触发 build，反之亦然（三个 skill description 边界是否清晰）
+测三件事：
+1. **显式召回**：只有显式点名 `$harness-*`、`/harness-*` 或“运行 harness-*”的 query 才路由到对应 skill。
+2. **互斥**：review / fix / build 的显式样本不串触发。
+3. **近邻误触发**：普通应用 bug、schema、CI pipeline、GitHub Actions、API adapter 等共享关键词的开发任务必须返回 `none`；未显式调用的 harness 请求也必须返回 `none`。
 
-`fixtures/trigger-evals.json` 每条标注 `expected_skill`（review/fix/build/none）。
+`fixtures/trigger-evals.json` 每条标注 `expected_skill`（review/fix/build/none）。默认每条独立运行 3 次，任一次误触发都会计入失败；严格通过要求误触发、漏触发、串触发均为 0，attempt accuracy ≥95%。Codex/Claude 的平台调用策略由 L1 静态检查阻塞。
 
 ## 加新用例
 

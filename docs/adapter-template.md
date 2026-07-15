@@ -2,17 +2,21 @@
 
 把本模板的内容拷进你的项目，填好尖括号部分。适配器承载所有**项目专属**的内容 —— 这些正是通用 `harness-skills` 刻意不包含的部分。
 
-载体随你选（详见 README「配合项目适配器使用」）：
+默认通过 `$harness-build --adapter <project>`（Codex）或 `/harness-build --adapter <project>`（Claude Code）生成。生成前必须扫描目标 workflow、schema、QC、manifest/status 和产物目录，用真实仓库证据替换尖括号内容。
 
-- **本地适配器 skill**：`.agents/skills/<project>-harness-adapter/SKILL.md`；如果只给 Claude Code 用，也可以放到 `.claude/skills/<project>-harness-adapter/SKILL.md`。作为 skill 使用时保留下方 frontmatter。
-- **约定文件**：`AGENTS.md` / `CLAUDE.md` 里的一节，去掉 frontmatter、只留正文即可。
+载体按以下优先级选择（详见 README「项目适配器」）：
+
+- **被动契约文件（默认）**：`.harness/adapter.md`，去掉下方 frontmatter。它不参与 skill 路由，只由显式激活的 harness skill 读取。
+- **约定文件**：`AGENTS.md` / `CLAUDE.md` 里的一节，去掉 frontmatter。仅适合规则少且可以常驻上下文的项目。
+- **本地适配器 skill（仅按需）**：`.agents/skills/<project>-harness-adapter/SKILL.md`。必须关闭 Codex 与 Claude Code 的隐式调用。
 
 ```markdown
 ---
 name: <project>-harness-adapter
 description: <project> 的项目专属 harness 规则。与通用 harness-review / harness-fix / harness-build 一同加载，为本项目提供真实路径、产物名、QC 脚本名、强制路径规则与项目 playbook。仅在本项目内触发。
+disable-model-invocation: true
 ---
-（仅当载体是 skill 时需要上面的 frontmatter；写进 AGENTS.md / CLAUDE.md 时删掉它。）
+（仅当载体是 skill 时保留上面的 frontmatter，并另建 `agents/openai.yaml`，写入 `policy.allow_implicit_invocation: false`；被动契约或约定文件删除 frontmatter。）
 
 # <project>-harness-adapter
 
@@ -46,4 +50,4 @@ description: <project> 的项目专属 harness 规则。与通用 harness-review
 | <类型> | <经验> | <原因> | <计划补的 QC/test/eval 或 N/A> |
 ```
 
-让适配器（无论以何种载体存在）成为项目专属知识唯一的沉淀处，通用 skill 才能始终保持纯净。
+让适配器（无论以何种载体存在）成为项目专属知识唯一的沉淀处，通用 skill 才能始终保持纯净。adapter 只描述 Agent Skill harness 工作流；普通 API、SDK、数据库或 UI adapter 不属于本模板。

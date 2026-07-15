@@ -1,6 +1,7 @@
 ---
 name: harness-fix
-description: 对 LLM 工作流（skill/pipeline）中发现的具体 bug 或异常，执行系统化的「根因溯源 → 前置检测 → 修复」三层闭环。触发词：harness-fix、系统化修复、根因分析、前置发现、避免复现、harness问题。与 harness-review 的区别：review 是全量审计（逐维度评分），harness-fix 是针对**已知症状**的单点深挖与修复。**不适用场景**：功能空缺/schema 扩展/新功能发现的改进建议，应使用 harness-build。
+description: 仅在用户显式调用 harness-fix（Codex `$harness-fix` 或 Claude Code `/harness-fix`）时使用。修复通过 Agent Skill 执行的 harness 工作流已经暴露的工程故障，目标必须涉及 workflow skill、sidecar、manifest、逐步 QC、恢复状态或 harness 契约，并执行根因、前置检测、源头修复闭环。普通应用 bug、接口或数据库 schema、常规测试、CI/CD 和一般软件排障不触发；新增 harness 能力使用 harness-build。
+disable-model-invocation: true
 metadata:
   category: workflow-harness
   role: fix
@@ -8,7 +9,7 @@ metadata:
 
 # harness-fix
 
-针对在 skill/pipeline 运行过程中**已发现的具体 bug 或异常**，执行「根因溯源 → 前置检测 → 修复」三层闭环，确保问题不在未来复现。
+针对通过 Agent Skill 执行的 harness 工作流中**已发现的具体 bug 或异常**，执行「根因溯源 → 前置检测 → 修复」三层闭环，确保问题不在未来复现。
 
 ## 铁律（The Iron Law）
 

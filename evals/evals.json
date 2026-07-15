@@ -1,13 +1,13 @@
 {
   "skill_repo": "harness-skills",
-  "schema_version": "1.0",
-  "last_updated": "2026-06-01",
-  "description": "三层评估：L1 lint（SKILL.md 自洽合规，零 LLM）/ L2 behavioral（review 能否检出植入缺陷）/ L3 trigger（三 skill 路由准召+互斥）。",
+  "schema_version": "1.1",
+  "last_updated": "2026-07-15",
+  "description": "三层评估：L1 lint（SKILL.md 自洽合规与显式调用策略）/ L2 behavioral（review 能否检出植入缺陷）/ L3 trigger（显式路由、互斥与普通开发近邻误触发）。",
 
   "l1_lint": {
     "runner": "evals/scripts/run_l1_lint.py",
     "blocks_ci": true,
-    "checks": ["frontmatter 合规", "零领域残留", "交叉引用完整", "指令正向性自审", "渐进披露"]
+    "checks": ["frontmatter 合规", "Codex/Claude 显式调用策略", "零领域残留", "交叉引用完整", "指令正向性自审", "渐进披露"]
   },
 
   "l2_behavioral": {
@@ -36,7 +36,10 @@
   "l3_trigger": {
     "runner": "evals/scripts/run_l3_trigger.py",
     "fixtures": "evals/fixtures/trigger-evals.json",
-    "target_accuracy": 0.85,
-    "target_cross_skill_errors": 0
+    "runs_per_case": 3,
+    "target_attempt_accuracy": 0.95,
+    "target_cross_skill_attempts": 0,
+    "target_missed_attempts": 0,
+    "target_false_fire_attempts": 0
   }
 }

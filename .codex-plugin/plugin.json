@@ -1,6 +1,6 @@
 {
   "name": "harness-skills",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "通用 LLM 工作流 harness 方法论：审计、修复并扩展多步骤 agent 工作流，覆盖断点续跑、程序化 QC、可观测性与失败契约。",
   "author": {
     "name": "yuchuan"

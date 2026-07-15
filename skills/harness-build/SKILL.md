@@ -1,6 +1,7 @@
 ---
 name: harness-build
-description: 为任意多步骤工作流扩展新的契约字段、sidecar 文件、QC 规则或 pipeline step，执行「设计 → 实现 → QC 更新 → 文档同步」闭环。触发词：harness-build、schema/契约扩展、加字段、新功能、新步骤、新 sidecar、把某个流程加入 skill step。与 harness-fix 的区别：fix 修已知 bug，build 落地新功能；若需求其实是修复已暴露异常，应改用 harness-fix。
+description: 仅在用户显式调用 harness-build（Codex `$harness-build` 或 Claude Code `/harness-build`）时使用。为通过 Agent Skill 执行的长时、多步骤、可恢复 harness 工作流新增契约、sidecar、manifest、逐步 QC、可恢复 step，或创建和更新项目 harness adapter。普通产品功能、数据库或接口 schema、CI/CD pipeline step、一般代码生成、测试和文档变更不触发；已暴露的 harness 故障使用 harness-fix。
+disable-model-invocation: true
 metadata:
   category: workflow-harness
   role: build
@@ -8,7 +9,7 @@ metadata:
 
 # harness-build
 
-将功能需求落地为代码 + 契约 + QC 变更，并同步所有下游文档。
+将 harness 工作流能力落地为代码 + 契约 + QC 变更，并同步所有下游文档；也负责生成项目 harness adapter。
 
 ## 铁律（The Iron Law）
 
@@ -61,6 +62,21 @@ NO FEATURE IS DONE UNTIL ALL FOUR LAYERS LAND.
 ```
 
 若用户明确要求"直接做/继续"，不要等待确认；在最终回复中列出采用的规格假设。
+
+---
+
+### Adapter 模式
+
+当用户显式调用 `harness-build --adapter <project>`，或明确要求生成/更新项目 harness adapter 时：
+
+1. 定位项目中实际执行工作流的 `SKILL.md`，确认它确实是长时、多步骤、可恢复的单 agent 工作流。
+2. 扫描现有 schema、sidecar、manifest/status、逐步 QC、运行目录和失败处理入口；只记录工具已经证实的路径与命令。
+3. 默认以 `docs/adapter-template.md` 为结构，生成项目内的被动契约文件 `.harness/adapter.md`。被动文件不参与 skill 自动路由，由已显式激活的 harness skill 主动查找并读取。
+4. 仅当用户明确要求 adapter 本身作为 skill 安装时，生成 `<project>-harness-adapter/SKILL.md`，并同时配置 Codex `policy.allow_implicit_invocation: false` 与 Claude Code `disable-model-invocation: true`。
+5. 对无法从仓库证实的项目经验保留待填写标记；不得把推测写成强制规则。
+6. 验证 adapter 至少包含真实的 workflow 路径、产物布局、QC、schema、manifest/status 和 regression hook；缺失项必须明确标为未发现或不适用。
+
+adapter 是项目语境契约，不是第四个自动路由入口。普通 API/SDK、数据库或 UI adapter 不属于本模式。
 
 ---
 

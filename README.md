@@ -2,7 +2,7 @@
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-d97757)](https://github.com/qiyuey/harness-skills)
 [![Codex](https://img.shields.io/badge/Codex-plugin-412991)](https://github.com/qiyuey/harness-skills)
-[![evals](https://img.shields.io/badge/evals-L1_PASS_·_L2_6%2F6_·_L3_18%2F18-2ea44f)](evals/README.md)
+[![evals](https://img.shields.io/badge/evals-L1_PASS_·_L2_7%2F7_·_L3_90%2F90-2ea44f)](evals/README.md)
 [![License](https://img.shields.io/badge/license-Anti--996-blue)](https://github.com/996icu/996.ICU)
 
 面向 AI agent 的通用 **LLM 工作流 harness 方法论**：审计、修复并扩展长时间、多步骤的 agent 工作流，让流程能断点续跑、局部重做、程序化质检、事后追溯。
@@ -45,19 +45,19 @@ mkdir -p ~/.claude/skills
 cp -R skills/* ~/.claude/skills/
 ```
 
-安装后直接描述你的目标即可，agent 会根据 skill 的 `description` 自动选择。需要手动点名时，用下面的路由规则。
+三个 harness skill 都是**显式调用型工作流**，安装后不会介入普通软件开发。Codex 使用 `$harness-*`，Claude Code 使用 `/harness-*`：
 
 | 你要做什么 | 使用 |
 |------------|------|
-| 审计一个多步骤 workflow skill 的 harness 设计 | `harness-review` |
-| 修复一个已经暴露的 workflow bug，并防止复发 | `harness-fix` |
-| 新增契约字段、sidecar、QC 规则或 pipeline step | `harness-build` |
+| 审计一个多步骤 workflow skill 的 harness 设计 | `$harness-review` / `/harness-review` |
+| 修复一个已经暴露的 harness workflow bug，并防止复发 | `$harness-fix` / `/harness-fix` |
+| 新增 harness 契约、sidecar、QC、step 或生成 adapter | `$harness-build` / `/harness-build` |
 
 ## Agent 读取要点
 
 当本 README 被 agent 作为项目上下文读取时，按以下规则使用：
 
-- 只有任务涉及长时间、多步骤、可恢复的单 agent 工作流时，才使用本仓库的 skill。
+- 只有用户显式调用对应 skill，且任务涉及通过 Agent Skill 执行的长时间、多步骤、可恢复单 agent 工作流时，才使用本仓库的 skill。
 - 需要审计 workflow 设计时用 `harness-review`。
 - 已知 bug / 异常 / 失败症状需要系统修复时用 `harness-fix`。
 - 新增字段、sidecar、QC 规则或 pipeline step 时用 `harness-build`。
@@ -117,10 +117,11 @@ LLM 长链路工作流常见的问题不是“模型不会写”，而是流程�
 
 本仓库保持通用，不包含任何消费方项目的路径、产物命名、QC 脚本名或项目 playbook。项目专属信息建议沉淀到一个 adapter，让 `harness-fix` / `harness-build` 先读到本项目语境，再套用通用方法论。
 
-adapter 可以放在三种地方：
+adapter 默认是被动契约，不参与 skill 自动路由。使用 `$harness-build --adapter <project>` 或 `/harness-build --adapter <project>`，让 agent 扫描真实 workflow、schema、QC、manifest 和产物路径后生成。adapter 可以放在三种地方：
 
-- **约定文件**：写进项目根的 `AGENTS.md` 或 `CLAUDE.md`。最轻量，适合规则少的项目。
-- **本地 adapter skill**：放到 `<project>/.agents/skills/<project>-harness-adapter/SKILL.md`；只给 Claude Code 用时可放到 `<project>/.claude/skills/<project>-harness-adapter/SKILL.md`。
+- **被动契约文件（默认）**：放到 `<project>/.harness/adapter.md`。只有已经显式激活的 harness skill 主动读取，不占用自动路由。
+- **约定文件**：写进项目根的 `AGENTS.md` 或 `CLAUDE.md`。适合规则少且愿意让这些规则常驻上下文的项目。
+- **本地 adapter skill（仅按需）**：放到 `<project>/.agents/skills/<project>-harness-adapter/SKILL.md`；必须关闭 Codex 和 Claude Code 的隐式调用，避免 adapter 自己成为第四个自动入口。
 - **对话内联**：项目很小时，直接在运行 skill 时把路径、产物名、项目经验告诉 agent。
 
 模板见 [docs/adapter-template.md](docs/adapter-template.md)。
@@ -152,9 +153,9 @@ eval 套件位于 [evals/](evals/README.md)。因为这些是纯文本方法论 
 |------|--------|---------|------|
 | L1 Lint | `SKILL.md` frontmatter、交叉引用、零领域残留、指令极性 | 否 | `python3 evals/scripts/run_evals.py --layer l1` |
 | L2 Behavioral | `harness-review` 能否识别植入缺陷的 workflow skill | 是，使用 `claude` CLI | `python3 evals/scripts/run_evals.py --layer l2` |
-| L3 Trigger | 三个 skill 的路由准确率和互斥性 | 是，使用 `claude` CLI | `python3 evals/scripts/run_evals.py --layer l3` |
+| L3 Trigger | 显式路由、互斥性和普通开发近邻误触发，每条默认运行 3 次 | 是，使用 `claude` CLI | `python3 evals/scripts/run_evals.py --layer l3 --strict` |
 
-最近一次结果：**L1 PASS · L2 6/6 · L3 18/18**。
+质量门槛：**L1 零失败 · L2 ≥6/7 · L3 attempt accuracy ≥95%，且误触发/漏触发/串触发均为 0**。
 
 ```bash
 python3 evals/scripts/run_evals.py

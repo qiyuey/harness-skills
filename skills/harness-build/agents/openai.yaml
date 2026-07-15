@@ -1,0 +1,5 @@
+interface:
+  display_name: "Harness Build"
+  short_description: "Extend a harness workflow or create its adapter"
+policy:
+  allow_implicit_invocation: false
